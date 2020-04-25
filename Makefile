@@ -1,5 +1,10 @@
-run:
-	clang++ main.cpp -lrtAudio -std=c++11 && ./a.out
+COMPILE_FLAGS = -lrtAudio -std=c++11 -I .
 
-debug:
-	clang++ main.cpp -lrtAudio -std=c++11 -g3
+all:
+	clang++ main.cpp ${COMPILE_FLAGS}
+
+run: all
+	./a.out
+
+record:
+	clang++ record.cpp ${COMPILE_FLAGS}
