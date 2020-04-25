@@ -6,6 +6,8 @@
 
 namespace internal {
 
+// Settings required for reading and writing to the stream via the RtAudio
+// callback.
 struct StreamSettings {
   SignalTransformFn transform_fn;
   int num_channels;

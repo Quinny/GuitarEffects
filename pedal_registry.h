@@ -26,7 +26,7 @@ class PedalRegistry {
   //
   // Returns a bool because we need it for the macro to work properly. The C++
   // compiler needs the registration line to be an assignment otherwise the code
-  // won't compile.
+  // won't compile because it parses are a declaration.
   bool RegisterPedal(const std::string& pedal_name, PedalFactoryFn factory_fn) {
     pedal_factories_.emplace(pedal_name, std::move(factory_fn));
     return true;
@@ -44,14 +44,15 @@ class PedalRegistry {
   std::unordered_map<std::string, PedalFactoryFn> pedal_factories_;
 };
 
-// Generate a variable name based on the current line to prevent repeated
-// definitions.
-#define LINE_NAME(prefix) JOIN(prefix, __COUNTER__)
+// Generates a random variable name. This is used to prevent collisions between
+// different pedals registering themselves.
+#define RANDOM_NAME(prefix) JOIN(prefix, __COUNTER__)
 #define JOIN(symbol1, symbol2) _DO_JOIN(symbol1, symbol2)
 #define _DO_JOIN(symbol1, symbol2) symbol1##symbol2
 
 // Register a pedal with the registry.
-#define REGISTER_PEDAL(...) \
-  auto LINE_NAME(qp) = PedalRegistry::GetInstance().RegisterPedal(__VA_ARGS__);
+#define REGISTER_PEDAL(...)                          \
+  auto RANDOM_NAME(qp_pedal_registration_reserved) = \
+      PedalRegistry::GetInstance().RegisterPedal(__VA_ARGS__);
 
 #endif /* PEDAL_REGISTRY_H */

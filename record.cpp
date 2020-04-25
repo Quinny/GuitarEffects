@@ -5,7 +5,7 @@
 #include "signal.h"
 
 // Record audio signal and dumps it to a file called "recording" which can then
-// be read by Playback.
+// be read by a Playback object (see playback.h).
 int main() {
   std::vector<SignalType> recorded_signal;
   AudioTransformer at(

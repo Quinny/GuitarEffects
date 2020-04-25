@@ -6,8 +6,12 @@
 
 #include "signal.h"
 
-// Reads a recording file (see record.cpp) into memory and replays the signal
-// in a loop through the "next()" method.
+// Reads a recording file (see record.cpp to generate such files) into memory
+// and replays the signal in a loop through the "next()" method.
+//
+// This is useful when debugging/testing new pedals as you don't need to keep
+// your guitar around. You can just make a recording and then loop it back
+// through the effects loop.
 class Playback {
  public:
   Playback(const std::string& filename) {
