@@ -7,8 +7,8 @@
 #include "pedals/blues_drive_pedal.h"
 #include "pedals/compressor_pedal.h"
 #include "pedals/delay_pedal.h"
-#include "pedals/distortion_pedal.h"
 #include "pedals/echo_pedal.h"
+#include "pedals/fuzz_pedal.h"
 
 #include "audio_transformer.h"
 #include "pedal_registry.h"
@@ -16,30 +16,6 @@
 #include "signal.h"
 
 #include "rtaudio/RtAudio.h"
-
-// Probe all the connected audio devices.
-void probe() {
-  RtAudio audio;
-  // Determine the number of devices available
-  unsigned int devices = audio.getDeviceCount();
-  // Scan through devices for various capabilities
-  RtAudio::DeviceInfo info;
-  for (unsigned int i = 0; i < devices; i++) {
-    info = audio.getDeviceInfo(i);
-    if (info.probed == true) {
-      // Print, for example, the maximum number of output channels for each
-      // device
-      std::cout << "device ID = " << i << std::endl;
-      std::cout << "device name: " << info.name << std::endl;
-      std::cout << ": maximum output channels = " << info.outputChannels
-                << std::endl;
-      std::cout << ": maximum input channels = " << info.inputChannels
-                << std::endl;
-      std::cout << "Native format: " << info.nativeFormats << std::endl;
-      std::cout << "Preferedd rate " << info.preferredSampleRate << std::endl;
-    }
-  }
-}
 
 class PedalChain : public Pedal {
  public:
@@ -89,14 +65,14 @@ class PedalChain : public Pedal {
 };
 
 int main() {
-  probe();
-
   PedalChain pedal_chain;
 
   Playback pb(/* filename = */ "recording");
-  AudioTransformer at([&pb, &pedal_chain](SignalType input) {
-    return pedal_chain.Transform(pb.next());
-  });
+  AudioTransformer at(
+      [&pb, &pedal_chain](SignalType input) {
+        return pedal_chain.Transform(pb.next());
+      },
+      /* input_device_index= */ 3, /* output_device_index= */ 1);
   at.Start();
 
   while (1) {

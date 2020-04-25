@@ -30,11 +30,13 @@ int callback(void *output_buffer, void *input_buffer,
 
 class AudioTransformer {
  public:
-  AudioTransformer(SignalTransformFn transform_fn)
+  AudioTransformer(SignalTransformFn transform_fn, int input_device_index,
+                   int output_device_index)
       : transform_fn_(std::move(transform_fn)) {
-    // TODO: Take this as constructor args.
-    const auto input_device = audio_interface_.getDeviceInfo(3);
-    const auto output_device = audio_interface_.getDeviceInfo(1);
+    const auto input_device =
+        audio_interface_.getDeviceInfo(input_device_index);
+    const auto output_device =
+        audio_interface_.getDeviceInfo(output_device_index);
 
     const auto num_channels =
         std::min(input_device.inputChannels, output_device.outputChannels);
@@ -59,6 +61,23 @@ class AudioTransformer {
 
   void Start() { audio_interface_.startStream(); }
   void Abort() { audio_interface_.abortStream(); }
+
+  void DumpDeviceInfo() {
+    unsigned int devices = audio_interface_.getDeviceCount();
+    for (unsigned int i = 0; i < devices; i++) {
+      auto info = audio_interface_.getDeviceInfo(i);
+      if (info.probed == true) {
+        std::cout << "device ID = " << i << std::endl;
+        std::cout << "device name: " << info.name << std::endl;
+        std::cout << ": maximum output channels = " << info.outputChannels
+                  << std::endl;
+        std::cout << ": maximum input channels = " << info.inputChannels
+                  << std::endl;
+        std::cout << "Native format: " << info.nativeFormats << std::endl;
+        std::cout << "Sample rate " << info.preferredSampleRate << std::endl;
+      }
+    }
+  }
 
  private:
   RtAudio audio_interface_;

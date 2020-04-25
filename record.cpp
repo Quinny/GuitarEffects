@@ -8,10 +8,12 @@
 // be read by Playback.
 int main() {
   std::vector<SignalType> recorded_signal;
-  AudioTransformer at([&recorded_signal](SignalType input) {
-    recorded_signal.push_back(input);
-    return input;
-  });
+  AudioTransformer at(
+      [&recorded_signal](SignalType input) {
+        recorded_signal.push_back(input);
+        return input;
+      },
+      /* input_device_index= */ 3, /* output_device_index= */ 1);
 
   at.Start();
   std::cout << "Press any key to stop recording" << std::endl;

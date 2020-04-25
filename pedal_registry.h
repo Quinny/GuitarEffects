@@ -46,7 +46,7 @@ class PedalRegistry {
 
 // Generate a variable name based on the current line to prevent repeated
 // definitions.
-#define LINE_NAME(prefix) JOIN(prefix, __LINE__)
+#define LINE_NAME(prefix) JOIN(prefix, __COUNTER__)
 #define JOIN(symbol1, symbol2) _DO_JOIN(symbol1, symbol2)
 #define _DO_JOIN(symbol1, symbol2) symbol1##symbol2
 
