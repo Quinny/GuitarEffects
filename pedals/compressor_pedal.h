@@ -5,6 +5,11 @@
 #include "pedal_registry.h"
 #include "signal.h"
 
+// Attempts to compress the signal within a specific amplitude range.
+//
+// Instead of applying hard clipping outside of the range, this pedal does soft
+// clipping (allowing the signal to go outside the range, but damping the
+// portion that goes outside).
 class CompressorPedal : public Pedal {
  public:
   SignalType Transform(SignalType signal) override {

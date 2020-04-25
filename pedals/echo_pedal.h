@@ -8,12 +8,19 @@
 #include "pedal_registry.h"
 #include "signal.h"
 
+// Echos the input signal delayed back onto itself, decaying the echo at each
+// step.
+//
+// The difference between echo and delay is that echo propagates the previous
+// signal back into the buffer instead of overwriting with the input.
 class EchoPedal : public Pedal {
  public:
   EchoPedal(int buffer_size) : echo_buffer_(buffer_size, 0) {}
 
   SignalType Transform(SignalType signal) override {
-    echo_buffer_[echo_index_] = (echo_buffer_[echo_index_] + signal) / 4;
+    static constexpr int kDecayFactor = 4;
+    echo_buffer_[echo_index_] =
+        (echo_buffer_[echo_index_] + signal) / kDecayFactor;
     echo_index_ = (echo_index_ + 1) % echo_buffer_.size();
     return signal + echo_buffer_[echo_index_];
   }

@@ -17,9 +17,10 @@ class DelayPedal : public Pedal {
   DelayPedal(int buffer_size) : delay_buffer_(buffer_size, 0) {}
 
   SignalType Transform(SignalType signal) override {
+    static constexpr int kDecayFactor = 4;
     delay_buffer_[delay_index_] = signal;
     delay_index_ = (delay_index_ + 1) % delay_buffer_.size();
-    return signal + (delay_buffer_[delay_index_] / 4);
+    return signal + (delay_buffer_[delay_index_] / kDecayFactor);
   }
 
   std::string Describe() override {
