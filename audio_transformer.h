@@ -6,7 +6,14 @@
 
 namespace internal {
 
-// Callback on each buffer recieved from the RTAudio library.
+struct StreamSettings {
+  SignalTransformFn transform_fn;
+  int num_channels;
+};
+
+// Callback on each buffer recieved from the RTAudio library. Applies the
+// transformation function to the signal and writes the result into the output
+// buffer.
 int callback(void *output_buffer, void *input_buffer,
              unsigned int buffered_frames, double /* stream_time */,
              RtAudioStreamStatus status, void *data) {
@@ -14,14 +21,14 @@ int callback(void *output_buffer, void *input_buffer,
 
   auto *input = (SignalType *)input_buffer;
   auto *output = (SignalType *)output_buffer;
-  auto *transform = (SignalTransformFn *)data;
+  auto *stream_settings = (StreamSettings *)data;
+  const auto &transform_fn = stream_settings->transform_fn;
 
-  // There is 1 frame per each channel, so we actually need to double the number
-  // of buffered frames when dealing with 2 channels.
-  //
-  // TODO: The number of channels here should be variable.
-  for (unsigned int frame = 0; frame < buffered_frames * 2; ++frame) {
-    *(output + frame) = (*transform)(*(input + frame));
+  // There is 1 frame per each channel, so we need to read signal from each
+  // channel.
+  for (unsigned int frame = 0;
+       frame < buffered_frames * stream_settings->num_channels; ++frame) {
+    *(output + frame) = transform_fn(*(input + frame));
   }
   return 0;
 }
@@ -30,9 +37,11 @@ int callback(void *output_buffer, void *input_buffer,
 
 class AudioTransformer {
  public:
+  // Open an audio stream that reads signal from `input_device_index`,
+  // transforms it using `transform_fn` and writes the result to
+  // `output_device_index`.
   AudioTransformer(SignalTransformFn transform_fn, int input_device_index,
-                   int output_device_index)
-      : transform_fn_(std::move(transform_fn)) {
+                   int output_device_index) {
     const auto input_device =
         audio_interface_.getDeviceInfo(input_device_index);
     const auto output_device =
@@ -41,22 +50,25 @@ class AudioTransformer {
     const auto num_channels =
         std::min(input_device.inputChannels, output_device.outputChannels);
 
-    input_stream_parameters_.deviceId = 3;
+    stream_settings_.transform_fn = std::move(transform_fn);
+    stream_settings_.num_channels = num_channels;
+
+    input_stream_parameters_.deviceId = input_device_index;
     input_stream_parameters_.nChannels = num_channels;
 
-    output_stream_parameters_.deviceId = 1;
+    output_stream_parameters_.deviceId = output_device_index;
     output_stream_parameters_.nChannels = num_channels;
 
     audio_interface_.showWarnings(true);
 
-    // TODO: What is the optimal value here.
+    // TODO: What is the optimal value here?
     unsigned int frames_to_buffer = 256;
 
     auto sample_rate = std::min(input_device.preferredSampleRate,
                                 output_device.preferredSampleRate);
     audio_interface_.openStream(
         &output_stream_parameters_, &input_stream_parameters_, RTAUDIO_FLOAT32,
-        sample_rate, &frames_to_buffer, &internal::callback, &transform_fn_);
+        sample_rate, &frames_to_buffer, &internal::callback, &stream_settings_);
   }
 
   void Start() { audio_interface_.startStream(); }
@@ -83,8 +95,7 @@ class AudioTransformer {
   RtAudio audio_interface_;
   RtAudio::StreamParameters input_stream_parameters_;
   RtAudio::StreamParameters output_stream_parameters_;
-
-  SignalTransformFn transform_fn_;
+  internal::StreamSettings stream_settings_;
 };
 
 #endif /* AUDIO_TRANSFORMER_H */
