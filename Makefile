@@ -1,7 +1,7 @@
 COMPILE_FLAGS = -lrtAudio -std=c++11 -I .
 
-all:
-	clang++ main.cpp ${COMPILE_FLAGS}
+pedalboard:
+	clang++ pedalboard.cpp ${COMPILE_FLAGS}
 
 run: all
 	./a.out
