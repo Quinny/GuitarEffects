@@ -68,9 +68,13 @@ class AudioTransformer {
 
     auto sample_rate = std::min(input_device.preferredSampleRate,
                                 output_device.preferredSampleRate);
+
+    stream_options_.flags |= RTAUDIO_MINIMIZE_LATENCY;
+
     audio_interface_.openStream(
         &output_stream_parameters_, &input_stream_parameters_, RTAUDIO_FLOAT32,
-        sample_rate, &frames_to_buffer, &internal::callback, &stream_settings_);
+        sample_rate, &frames_to_buffer, &internal::callback, &stream_settings_,
+        &stream_options_);
   }
 
   void Start() { audio_interface_.startStream(); }
@@ -97,6 +101,7 @@ class AudioTransformer {
   RtAudio audio_interface_;
   RtAudio::StreamParameters input_stream_parameters_;
   RtAudio::StreamParameters output_stream_parameters_;
+  RtAudio::StreamOptions stream_options_;
   internal::StreamSettings stream_settings_;
 };
 
