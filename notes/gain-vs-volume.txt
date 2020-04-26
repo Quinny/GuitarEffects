@@ -1,0 +1,10 @@
+- Gain is how "loud" the signal is _before_ processing
+- Volume is how the "loud" the final output signal is
+
+E.g. one might do something like
+
+Gain -> Hard Clipping -> Volume
+
+In this case the gain will potentially increase the impact of the hard clipping,
+i.e. signals that may not have been clipped pre-gain will now be clipped. The
+final output is then readjusted to a suitable volume.
