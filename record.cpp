@@ -13,7 +13,8 @@ int main() {
         recorded_signal.push_back(input);
         return input;
       },
-      /* input_device_index= */ 3, /* output_device_index= */ 1);
+      /* input_device_index= */ 3, /* output_device_index= */ 1,
+      /* treat_input_as_mono= */ true);
 
   at.Start();
   std::cout << "Press any key to stop recording" << std::endl;

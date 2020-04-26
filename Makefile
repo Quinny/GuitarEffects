@@ -1,10 +1,12 @@
 COMPILE_FLAGS = -lrtAudio -std=c++11 -I .
 
-pedalboard:
-	clang++ pedalboard.cpp ${COMPILE_FLAGS}
+all: pedalboard record
 
-run: all
-	./a.out
+pedalboard:
+	clang++ pedalboard.cpp ${COMPILE_FLAGS} -o ./bin/pedalboard
 
 record:
-	clang++ record.cpp ${COMPILE_FLAGS}
+	clang++ record.cpp ${COMPILE_FLAGS} -o ./bin/record
+
+run: all
+	./bin/pedalboard
