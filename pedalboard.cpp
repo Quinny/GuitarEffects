@@ -67,13 +67,14 @@ class PedalChain : public Pedal {
 int main() {
   PedalChain pedal_chain;
 
-  // Playback pb(/* filename = */ "recording");
+  Playback pb(/* filename = */ "recording");
   AudioTransformer at(
       [&pb, &pedal_chain](SignalType input) {
-        return pedal_chain.Transform(input);
+        return pedal_chain.Transform(pb.next());
+        // return pedal_chain.Transform(input);
       },
       /* input_device_index= */ 3, /* output_device_index= */ 1,
-      /* treat_input_as_mono= */ true);
+      /* treat_input_as_mono= */ false);
   at.DumpDeviceInfo();
   at.Start();
 

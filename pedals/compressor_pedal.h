@@ -13,10 +13,10 @@
 class CompressorPedal : public Pedal {
  public:
   SignalType Transform(SignalType signal) override {
-    constexpr SignalType kThreshold = 0.7;
+    constexpr SignalType kThreshold = 0.0001;
     auto diff = std::abs(signal) - kThreshold;
     float signal_sign = signal < 0 ? -1 : 1;
-    return diff > 0 ? signal_sign * kThreshold + (signal / 10) : signal;
+    return diff > 0 ? signal_sign * kThreshold + (signal / 4) : signal;
   }
 
   std::string Describe() override { return "compressor"; }

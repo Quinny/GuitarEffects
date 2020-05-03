@@ -1,3 +1,11 @@
 [submodule "RtAudio"]
   path = rtaudio
   url = https://github.com/thestk/rtaudio
+
+[submodule "Q"]
+  path = cycfi/Q
+  url = https://github.com/cycfi/Q
+
+[submodule "Q Infra"]
+  path = cycfi/infra
+  url = https://github.com/cycfi/infra

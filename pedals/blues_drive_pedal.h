@@ -3,22 +3,29 @@
 
 #include "pedal.h"
 #include "pedal_registry.h"
+#include "q/fx/biquad.hpp"
 #include "signal.h"
 
 class BluesDrivePedal : public Pedal {
  public:
   SignalType Transform(SignalType signal) override {
-    return signal > 0 ? 1 - std::exp(-signal) : -1 + std::exp(signal);
-    /*
-    current_ = (current_ + 1) % period_;
-    return std::tanh(0.5 * current_ * 3.14159) * signal;*/
+    SignalType bandpass = bandpass_(signal);
+    SignalType shaped = std::tanh(bandpass);
+    SignalType lowpass = lowpass_(shaped);
+    return lowpass;
   }
 
   std::string Describe() override { return "blues drive"; }
 
-  int period_ = 100000;
-  int current_ = 0;
+ private:
+  static constexpr int kSampleRate = 44100;
+  static constexpr cycfi::q::frequency kFrequency = 1 * 1e3;
+
+  cycfi::q::bandpass_csg bandpass_{kFrequency, kSampleRate};
+  cycfi::q::lowpass lowpass_{kFrequency, kSampleRate};
 };
+
+constexpr cycfi::q::frequency BluesDrivePedal::kFrequency;
 
 REGISTER_PEDAL("bluesdrive",
                []() { return std::unique_ptr<Pedal>(new BluesDrivePedal()); });
