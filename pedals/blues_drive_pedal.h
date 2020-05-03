@@ -1,6 +1,8 @@
 #ifndef BLUES_DRIVE_PEDAL_H
 #define BLUES_DRIVE_PEDAL_H
 
+#include "fx/effects_pipeline.h"
+#include "fx/wave_shaper.h"
 #include "pedal.h"
 #include "pedal_registry.h"
 #include "q/fx/biquad.hpp"
@@ -8,12 +10,7 @@
 
 class BluesDrivePedal : public Pedal {
  public:
-  SignalType Transform(SignalType signal) override {
-    SignalType bandpass = bandpass_(signal);
-    SignalType shaped = std::tanh(bandpass);
-    SignalType lowpass = lowpass_(shaped);
-    return lowpass;
-  }
+  SignalType Transform(SignalType signal) override { return pipeline_(signal); }
 
   std::string Describe() override { return "blues drive"; }
 
@@ -23,6 +20,10 @@ class BluesDrivePedal : public Pedal {
 
   cycfi::q::bandpass_csg bandpass_{kFrequency, kSampleRate};
   cycfi::q::lowpass lowpass_{kFrequency, kSampleRate};
+  std::function<SignalType(int)> curve_ = [](int x) { return std::tanh(x); };
+  WaveShaper wave_shaper{curve_, 4096};
+
+  EffectsPipeline pipeline_{{bandpass_, wave_shaper, lowpass_}};
 };
 
 constexpr cycfi::q::frequency BluesDrivePedal::kFrequency;
