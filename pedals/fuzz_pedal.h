@@ -10,8 +10,14 @@
 class FuzzPedal : public Pedal {
  public:
   SignalType Transform(SignalType signal) override {
-    if (signal < -0.5) return -0.9;
-    if (signal > 0.5) return 0.9;
+    constexpr static SignalType kMax = 0.9;
+    constexpr static SignalType kPreGain = 0.4;
+
+    int input_sign = signal > 0 ? 1 : -1;
+    SignalType pre_gained = signal + (input_sign * kPreGain);
+
+    if (pre_gained < -kMax) return -kMax;
+    if (pre_gained > kMax) return kMax;
     return signal;
   }
 
