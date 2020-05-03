@@ -1,0 +1,8 @@
+Low pass filter - Passes signals with low frequencies, attenuates high frequencies
+
+High pass filter - Passes signals with high frequencies, attenuates low frequencies
+
+Band pass filter - Passes signals with a certain range, attenuates outside the range.
+Essentially low pass + high pass.
+
+* attenuates - reduces intensity
