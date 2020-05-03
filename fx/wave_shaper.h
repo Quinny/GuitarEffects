@@ -34,6 +34,7 @@ class WaveShaper {
     // Interpolate between the nearest samples on the curve.
     unsigned index1 = static_cast<unsigned>(virtual_index);
     unsigned index2 = index1 + 1;
+
     double interpolation_factor = virtual_index - index1;
     double value1 = curve_[index1];
     double value2 = curve_[index2];
