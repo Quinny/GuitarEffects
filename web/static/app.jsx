@@ -4,8 +4,9 @@ class AvailablePedal extends React.Component {
   }
 
   add() {
-    // Call server to add pedal, refresh board
-    console.log('Adding pedal');
+    $.get("/add_pedal/" + this.props.name, () => {
+      this.props.onChange();
+    });
   }
 
   render() {
@@ -24,7 +25,9 @@ class PedalList extends React.Component {
   }
 
   render() {
-    return (<AvailablePedal name="Delay" />);
+    return this.props.pedals.map(pedal => {
+      return (<AvailablePedal name={pedal} onChange={this.props.onChange} />)
+    });
   }
 }
 
@@ -75,44 +78,50 @@ class ActivePedal extends React.Component {
 class PedalBoard extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {'pedals': []};
+    this.props.registerRefresh(() => this.refresh());
+  }
+
+  componentDidMount() {
+    this.refresh();
   }
 
   refresh() {
-    // Call server and update state.
+    $.get('/active_pedals').done(pedals => {
+      this.setState({'pedals': pedals});
+    });
   }
 
   render() {
-    return (
-      <div>
-        <ActivePedal name="Delay" knobs={[
-          {
-            "name": "amount",
-            "value": 50,
-          }
-        ]}/>
-
-        <ActivePedal name="Distortion" knobs={[
-          {
-            "name": "drive",
-            "value": 50,
-          }
-        ]}/>
-      </div>
-    )
+    return this.state.pedals.map(pedal => {
+      return <ActivePedal name={pedal.name} knobs={pedal.knobs} />
+    });
   }
 }
 
 class App extends React.Component {
   constructor(props) {
     super(props);
+
+    this.refreshHandlers = [];
+  }
+
+  registerRefreshHandler(handler) {
+    this.refreshHandlers.push(handler);
+  }
+
+  refresh() {
+    for (const refreshHandler of this.refreshHandlers) {
+      refreshHandler();
+    }
   }
 
   render() {
     return (
       <div>
-        <PedalList />
+        <PedalList pedals={["delay"]} onChange={this.refresh.bind(this)} />
         <hr />
-        <PedalBoard />
+        <PedalBoard registerRefresh={this.registerRefreshHandler.bind(this)} />
       </div>
     )
   }

@@ -3,7 +3,7 @@
 
 #include "pedal.h"
 #include "pedal_registry.h"
-#include "signal.h"
+#include "signal_type.h"
 
 #include <iostream>
 #include <vector>
@@ -23,8 +23,14 @@ class DelayPedal : public Pedal {
     return signal + (delay_buffer_[delay_index_] / kDecayFactor);
   }
 
-  std::string Describe() override {
-    return "delay (" + std::to_string(delay_buffer_.size()) + ")";
+  PedalInfo Describe() override {
+    PedalInfo info;
+    info.name = "delay";
+
+    info.knobs.push_back(
+        PedalKnob{.name = "frames", .value = (double)delay_buffer_.size()});
+
+    return info;
   }
 
  private:
@@ -32,12 +38,7 @@ class DelayPedal : public Pedal {
   int delay_index_ = 0;
 };
 
-REGISTER_PEDAL("delay", []() {
-  int delay_frames;
-  std::cout << "How many frames would you like to delay? ";
-  std::cin >> delay_frames;
-
-  return std::unique_ptr<Pedal>(new DelayPedal(delay_frames));
-});
+REGISTER_PEDAL("delay",
+               []() { return std::unique_ptr<Pedal>(new DelayPedal(20000)); });
 
 #endif /* DELAY_PEDAL_H */

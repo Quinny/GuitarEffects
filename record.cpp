@@ -2,7 +2,7 @@
 
 #include "audio_transformer.h"
 #include "rtaudio/RtAudio.h"
-#include "signal.h"
+#include "signal_type.h"
 
 // Record audio signal and dumps it to a file called "recording" which can then
 // be read by a Playback object (see playback.h).

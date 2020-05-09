@@ -5,7 +5,7 @@
 #include "pedal_registry.h"
 #include "q/fx/dynamic.hpp"
 #include "q/fx/envelope.hpp"
-#include "signal.h"
+#include "signal_type.h"
 
 // Compresses the input signal.
 class CompressorPedal : public Pedal {
@@ -21,7 +21,11 @@ class CompressorPedal : public Pedal {
     return signal * compression_gain;
   }
 
-  std::string Describe() override { return "compressor"; }
+  PedalInfo Describe() override {
+    PedalInfo info;
+    info.name = "compressor";
+    return info;
+  }
 
  private:
   cycfi::q::compressor compressor_{/* threshold= */ 0.1,

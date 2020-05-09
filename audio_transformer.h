@@ -2,7 +2,7 @@
 #define AUDIO_TRANSFORMER_H
 
 #include "rtaudio/RtAudio.h"
-#include "signal.h"
+#include "signal_type.h"
 
 namespace internal {
 

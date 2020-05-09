@@ -13,7 +13,7 @@
 #include "audio_transformer.h"
 #include "pedal_registry.h"
 #include "playback.h"
-#include "signal.h"
+#include "signal_type.h"
 
 #include "rtaudio/RtAudio.h"
 
@@ -30,14 +30,14 @@ class PedalChain : public Pedal {
     return signal;
   }
 
-  std::string Describe() override {
+  PedalInfo Describe() override {
     std::lock_guard<std::mutex> lock(mu_);
-    std::string result;
+    PedalInfo info;
     for (auto &pedal : pedals_) {
-      result += pedal->Describe() + "-->";
+      info.name += pedal->Describe().name + "-->";
     }
-    result += "amp";
-    return result;
+    info.name += "amp";
+    return info;
   }
 
   PedalChain &AddPedal(std::unique_ptr<Pedal> pedal) {
@@ -99,14 +99,14 @@ int main() {
       if (pedal_factory_fn) {
         auto pedal = (*pedal_factory_fn)();
         pedal_chain.insert(pedal_location, std::move(pedal));
-        std::cout << pedal_chain.Describe() << std::endl;
+        std::cout << pedal_chain.Describe().name << std::endl;
       } else {
         std::cout << "Unknown pedal type: " << pedal_type << std::endl;
       }
     } else if (tokens[0] == "remove") {
       auto pedal_location = pedal_chain.begin() + std::stoi(tokens[1]);
       pedal_chain.remove(pedal_location);
-      std::cout << pedal_chain.Describe() << std::endl;
+      std::cout << pedal_chain.Describe().name << std::endl;
     }
   }
   return 0;

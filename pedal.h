@@ -1,7 +1,20 @@
 #ifndef PEDAL_H
 #define PEDAL_H
 
-#include "signal.h"
+#include <string>
+#include <vector>
+
+#include "signal_type.h"
+
+struct PedalKnob {
+  std::string name;
+  double value;
+};
+
+struct PedalInfo {
+  std::string name;
+  std::vector<PedalKnob> knobs;
+};
 
 // The base pedal class which defines some transformation on the input signal.
 //
@@ -11,7 +24,7 @@
 class Pedal {
  public:
   virtual SignalType Transform(SignalType signal) = 0;
-  virtual std::string Describe() = 0;
+  virtual PedalInfo Describe() = 0;
   virtual ~Pedal() = default;
 };
 

@@ -6,13 +6,17 @@
 #include "pedal.h"
 #include "pedal_registry.h"
 #include "q/fx/biquad.hpp"
-#include "signal.h"
+#include "signal_type.h"
 
 class BluesDrivePedal : public Pedal {
  public:
   SignalType Transform(SignalType signal) override { return pipeline_(signal); }
 
-  std::string Describe() override { return "blues drive"; }
+  PedalInfo Describe() override {
+    PedalInfo info;
+    info.name = "bluesdrive";
+    return info;
+  }
 
  private:
   static constexpr int kSampleRate = 44100;

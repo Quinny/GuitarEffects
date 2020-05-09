@@ -6,7 +6,7 @@
 
 #include "pedal.h"
 #include "pedal_registry.h"
-#include "signal.h"
+#include "signal_type.h"
 
 // Echos the input signal delayed back onto itself, decaying the echo at each
 // step.
@@ -25,8 +25,10 @@ class EchoPedal : public Pedal {
     return signal + echo_buffer_[echo_index_];
   }
 
-  std::string Describe() override {
-    return "echo (" + std::to_string(echo_buffer_.size()) + ")";
+  PedalInfo Describe() override {
+    PedalInfo info;
+    info.name = "echo";
+    return info;
   }
 
  private:
@@ -34,11 +36,7 @@ class EchoPedal : public Pedal {
   int echo_index_ = 0;
 };
 
-REGISTER_PEDAL("echo", []() {
-  int buffer_size;
-  std::cout << "How many frames would you like to echo?";
-  std::cin >> buffer_size;
-  return std::unique_ptr<Pedal>(new EchoPedal(buffer_size));
-});
+REGISTER_PEDAL("echo",
+               []() { return std::unique_ptr<Pedal>(new EchoPedal(20000)); });
 
 #endif /* ECHO_PEDAL_H */

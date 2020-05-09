@@ -3,7 +3,7 @@
 
 #include "pedal.h"
 #include "pedal_registry.h"
-#include "signal.h"
+#include "signal_type.h"
 
 // A pedal which creates a fuzz effect by applying hard clipping to the
 // input signal.
@@ -21,7 +21,11 @@ class FuzzPedal : public Pedal {
     return signal;
   }
 
-  std::string Describe() override { return "fuzz"; }
+  PedalInfo Describe() override {
+    PedalInfo info;
+    info.name = "fuzz";
+    return info;
+  }
 };
 
 REGISTER_PEDAL("fuzz", []() { return std::unique_ptr<Pedal>(new FuzzPedal); });

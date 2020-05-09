@@ -4,7 +4,7 @@
 #include <fstream>
 #include <vector>
 
-#include "signal.h"
+#include "signal_type.h"
 
 // Reads a recording file (see record.cpp to generate such files) into memory
 // and replays the signal in a loop through the "next()" method.
