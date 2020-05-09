@@ -9,3 +9,7 @@
 [submodule "Q Infra"]
   path = cycfi/infra
   url = https://github.com/cycfi/infra
+
+[submodule "Crow"]
+  path = crow
+  url = https://github.com/ipkn/crow
