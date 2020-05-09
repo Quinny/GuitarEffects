@@ -129,7 +129,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <PedalList pedals={["delay"]} onChange={this.refresh.bind(this)} />
+        <PedalList pedals={["delay", "bluesdrive"]} onChange={this.refresh.bind(this)} />
         <hr />
         <PedalBoard registerRefresh={this.registerRefreshHandler.bind(this)} />
       </div>

@@ -4,6 +4,7 @@
 
 #include "audio_transformer.h"
 #include "pedal_registry.h"
+#include "pedals/blues_drive_pedal.h"
 #include "pedals/delay_pedal.h"
 #include "playback.h"
 #include "web/pedal_board.h"
@@ -49,6 +50,9 @@ int main() {
     pedal_board.AdjustKnob(pedal_index, knob);
     return crow::response(200);
   });
+
+  // TODO: Add a method which queries the registry for all pedals for the
+  // list view.
 
   CROW_ROUTE(app, "/<string>")
   (serve_static_files("static"));
