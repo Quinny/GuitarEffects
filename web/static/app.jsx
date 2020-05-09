@@ -25,7 +25,7 @@ class PedalList extends React.Component {
   }
 
   render() {
-    return this.props.pedals.map(pedal => {
+    return this.props.pedals.map((pedal) => {
       return (<AvailablePedal name={pedal} onChange={this.props.onChange} />)
     });
   }
@@ -36,8 +36,18 @@ class Knob extends React.Component {
     super(props);
   }
 
-  tweak() {
+  tweak(event) {
     console.log("Tweaking knob " + this.props.name);
+    console.log("Value is " + event.target.value);
+  }
+
+  onChange(event) {
+    console.log(event.target.value);
+    const knobUpdate = {
+      'name': this.props.name,
+      'value': event.target.value,
+    };
+    $.get('/adjust_knob/' + this.props.pedalIndex, knobUpdate).done(this.props.refresh);
   }
 
   render() {
@@ -48,7 +58,7 @@ class Knob extends React.Component {
         <button class="btn btn-primary btn-small" onClick={boundTweak}>
           +
         </button>
-        <input value={this.props.value} onChange={boundTweak} />
+        <input value={this.props.value} onChange={this.onChange.bind(this)} />
         <button class="btn btn-primary btn-small" onClick={boundTweak}>
           -
         </button>
@@ -64,7 +74,7 @@ class ActivePedal extends React.Component {
 
   render() {
     const knobs = this.props.knobs.map((knob) => {
-      return (<Knob name={knob.name} value={knob.value} />)
+      return (<Knob name={knob.name} value={knob.value} pedalIndex={this.props.index} refresh={this.props.refresh} />)
     });
     return (
       <p>
@@ -93,8 +103,8 @@ class PedalBoard extends React.Component {
   }
 
   render() {
-    return this.state.pedals.map(pedal => {
-      return <ActivePedal name={pedal.name} knobs={pedal.knobs} />
+    return this.state.pedals.map((pedal, index) => {
+      return <ActivePedal name={pedal.name} knobs={pedal.knobs} index={index} refresh={this.refresh.bind(this)} />
     });
   }
 }

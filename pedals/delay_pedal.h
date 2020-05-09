@@ -33,6 +33,10 @@ class DelayPedal : public Pedal {
     return info;
   }
 
+  void AdjustKnob(const PedalKnob& knob) override {
+    delay_buffer_ = std::vector<SignalType>((int)knob.value, 0);
+  }
+
  private:
   std::vector<SignalType> delay_buffer_;
   int delay_index_ = 0;

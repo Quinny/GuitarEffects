@@ -41,6 +41,15 @@ int main() {
     return crow::response(ret);
   });
 
+  CROW_ROUTE(app, "/adjust_knob/<int>")
+  ([&pedal_board](const crow::request& request, int pedal_index) {
+    PedalKnob knob;
+    knob.name = request.url_params.get("name");
+    knob.value = std::stod(request.url_params.get("value"));
+    pedal_board.AdjustKnob(pedal_index, knob);
+    return crow::response(200);
+  });
+
   CROW_ROUTE(app, "/<string>")
   (serve_static_files("static"));
 

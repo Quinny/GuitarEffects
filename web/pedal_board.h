@@ -20,6 +20,11 @@ class PedalBoard : public Pedal {
     return input;
   }
 
+  void AdjustKnob(int pedal_index, const PedalKnob& knob) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    pedals_[pedal_index]->AdjustKnob(knob);
+  }
+
   // TODO: this.
   PedalInfo Describe() override { return PedalInfo{}; }
 

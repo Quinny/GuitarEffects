@@ -24,6 +24,7 @@ struct PedalInfo {
 class Pedal {
  public:
   virtual SignalType Transform(SignalType signal) = 0;
+  virtual void AdjustKnob(const PedalKnob& /* knob */) {}
   virtual PedalInfo Describe() = 0;
   virtual ~Pedal() = default;
 };
