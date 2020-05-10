@@ -1,12 +1,13 @@
+// A pedal which is available to be added an as active pedal.
 class AvailablePedal extends React.Component {
   constructor(props) {
     super(props);
   }
 
+  // Add this pedal to the active pedal list.
   add() {
-    $.get("/add_pedal/" + this.props.name, () => {
-      this.props.onChange();
-    });
+    $.get("/add_pedal/" + this.props.name)
+      .done(this.props.onChange);
   }
 
   render() {
@@ -19,41 +20,56 @@ class AvailablePedal extends React.Component {
   }
 }
 
-class PedalList extends React.Component {
+// The list of pedals available to be added to the board.
+class AvailablePedalList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {"pedals": []};
+    this.state = {
+      "pedals": []
+    };
   }
 
+  // Fetch the list of available pedals from the server.
   componentDidMount() {
-    $.get("/available_pedals").done((pedals) => {
-      this.setState({"pedals": pedals});
-    });
+    $.get("/available_pedals")
+      .done((pedals) => {
+        this.setState({
+          "pedals": pedals,
+        });
+      });
   }
 
   render() {
     return this.state.pedals.map((pedal) => {
-      return (<AvailablePedal name={pedal} onChange={this.props.onChange} />)
+      return (<AvailablePedal
+                 name={pedal}
+                 onChange={this.props.onChange} />)
     });
   }
 }
 
+// A knob which adjusts the settings of an active pedal.
 class Knob extends React.Component {
   constructor(props) {
     super(props);
   }
 
+  // TODO: Pass down a tweak amount from the server and apply an update based
+  // on that.
   tweak(event) {
     console.log("Tweaking knob " + this.props.name);
     console.log("Value is " + event.target.value);
   }
 
+  // Send the knob update to the server and refresh the board.
   onChange(event) {
     const knobUpdate = {
       'name': this.props.name,
       'value': event.target.value,
     };
-    $.get('/adjust_knob/' + this.props.pedalIndex, knobUpdate).done(this.props.refresh);
+
+    $.get('/adjust_knob/' + this.props.pedalIndex, knobUpdate)
+      .done(this.props.refresh);
   }
 
   render() {
@@ -73,24 +89,37 @@ class Knob extends React.Component {
   }
 }
 
+// An active pedal which is running on the board and applying effects to the
+// signal.
 class ActivePedal extends React.Component {
   constructor(props) {
     super(props);
   }
 
+  // Remove this pedal from the board.
   remove() {
-    $.get('/remove_pedal/' + this.props.index).done(this.props.refresh);
+    $.get('/remove_pedal/' + this.props.index)
+     .done(this.props.refresh);
   }
 
   render() {
     const knobs = this.props.knobs.map((knob) => {
-      return (<Knob name={knob.name} value={knob.value} pedalIndex={this.props.index} refresh={this.props.refresh} />)
+      return (
+          <Knob
+            name={knob.name}
+            value={knob.value}
+            pedalIndex={this.props.index}
+            refresh={this.props.refresh} />
+      )
     });
+
     return (
       <p>
         {this.props.name}
         {knobs}
-        <button class="btn btn-danger btn-small" onClick={this.remove.bind(this)} >
+        <button
+          class="btn btn-danger btn-small"
+          onClick={this.remove.bind(this)} >
           Remove
         </button>
       </p>
@@ -98,26 +127,41 @@ class ActivePedal extends React.Component {
   }
 }
 
+// The board of active pedals.
 class PedalBoard extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {'pedals': []};
-    this.props.registerRefresh(() => this.refresh());
+    this.state = {
+      'pedals': []
+    };
+
+    // Register a refresh function with the app so that other components can
+    // trigger a board refresh when they change state.
+    this.props.registerRefresh(this.refresh.bind(this));
   }
 
   componentDidMount() {
     this.refresh();
   }
 
+  // Refetch the active pedals from the server.
   refresh() {
     $.get('/active_pedals').done(pedals => {
-      this.setState({'pedals': pedals});
+      this.setState({
+        'pedals': pedals
+      });
     });
   }
 
   render() {
     return this.state.pedals.map((pedal, index) => {
-      return <ActivePedal name={pedal.name} knobs={pedal.knobs} index={index} refresh={this.refresh.bind(this)} />
+      return (
+          <ActivePedal
+             name={pedal.name}
+             knobs={pedal.knobs}
+             index={index}
+             refresh={this.refresh.bind(this)} />
+      )
     });
   }
 }
@@ -142,9 +186,10 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <PedalList onChange={this.refresh.bind(this)} />
+        <AvailablePedalList onChange={this.refresh.bind(this)} />
         <hr />
-        <PedalBoard registerRefresh={this.registerRefreshHandler.bind(this)} />
+        <PedalBoard
+           registerRefresh={this.registerRefreshHandler.bind(this)} />
       </div>
     )
   }
