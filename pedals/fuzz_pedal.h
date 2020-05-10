@@ -23,11 +23,11 @@ class FuzzPedal : public Pedal {
 
   PedalInfo Describe() override {
     PedalInfo info;
-    info.name = "fuzz";
+    info.name = "Fuzz";
     return info;
   }
 };
 
-REGISTER_PEDAL("fuzz", []() { return std::unique_ptr<Pedal>(new FuzzPedal); });
+REGISTER_PEDAL("Fuzz", []() { return std::unique_ptr<Pedal>(new FuzzPedal); });
 
 #endif /* FUZZ_PEDAL_H */

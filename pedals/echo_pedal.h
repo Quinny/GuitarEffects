@@ -27,7 +27,7 @@ class EchoPedal : public Pedal {
 
   PedalInfo Describe() override {
     PedalInfo info;
-    info.name = "echo";
+    info.name = "Echo";
     return info;
   }
 
@@ -36,7 +36,7 @@ class EchoPedal : public Pedal {
   int echo_index_ = 0;
 };
 
-REGISTER_PEDAL("echo",
+REGISTER_PEDAL("Echo",
                []() { return std::unique_ptr<Pedal>(new EchoPedal(20000)); });
 
 #endif /* ECHO_PEDAL_H */

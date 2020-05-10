@@ -25,7 +25,7 @@ class DelayPedal : public Pedal {
 
   PedalInfo Describe() override {
     PedalInfo info;
-    info.name = "delay";
+    info.name = "Delay";
 
     info.knobs.push_back(
         PedalKnob{.name = "frames", .value = (double)delay_buffer_.size()});
@@ -42,7 +42,7 @@ class DelayPedal : public Pedal {
   int delay_index_ = 0;
 };
 
-REGISTER_PEDAL("delay",
+REGISTER_PEDAL("Delay",
                []() { return std::unique_ptr<Pedal>(new DelayPedal(20000)); });
 
 #endif /* DELAY_PEDAL_H */

@@ -39,6 +39,15 @@ class PedalRegistry {
     return factory_it == pedal_factories_.end() ? nullptr : &factory_it->second;
   }
 
+  std::vector<PedalInfo> GetRegisteredPedals() {
+    std::vector<PedalInfo> registered_pedals;
+    for (const auto& pedals : pedal_factories_) {
+      const auto& factory = pedals.second;
+      registered_pedals.push_back(factory()->Describe());
+    }
+    return registered_pedals;
+  }
+
  private:
   PedalRegistry() = default;
   std::unordered_map<std::string, PedalFactoryFn> pedal_factories_;

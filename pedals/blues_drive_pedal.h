@@ -14,7 +14,7 @@ class BluesDrivePedal : public Pedal {
 
   PedalInfo Describe() override {
     PedalInfo info;
-    info.name = "bluesdrive";
+    info.name = "BluesDrive";
     return info;
   }
 
@@ -32,7 +32,7 @@ class BluesDrivePedal : public Pedal {
 
 constexpr cycfi::q::frequency BluesDrivePedal::kFrequency;
 
-REGISTER_PEDAL("bluesdrive",
+REGISTER_PEDAL("BluesDrive",
                []() { return std::unique_ptr<Pedal>(new BluesDrivePedal()); });
 
 #endif /* BLUES_DRIVE_PEDAL_H */

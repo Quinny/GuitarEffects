@@ -25,6 +25,11 @@ class PedalBoard : public Pedal {
     pedals_[pedal_index]->AdjustKnob(knob);
   }
 
+  void RemovePedal(int pedal_index) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    pedals_.erase(pedals_.begin() + pedal_index);
+  }
+
   // TODO: this.
   PedalInfo Describe() override { return PedalInfo{}; }
 

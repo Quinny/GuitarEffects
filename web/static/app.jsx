@@ -78,6 +78,10 @@ class ActivePedal extends React.Component {
     super(props);
   }
 
+  remove() {
+    $.get('/remove_pedal/' + this.props.index).done(this.props.refresh);
+  }
+
   render() {
     const knobs = this.props.knobs.map((knob) => {
       return (<Knob name={knob.name} value={knob.value} pedalIndex={this.props.index} refresh={this.props.refresh} />)
@@ -86,6 +90,9 @@ class ActivePedal extends React.Component {
       <p>
         {this.props.name}
         {knobs}
+        <button class="btn btn-danger btn-small" onClick={this.remove.bind(this)} >
+          Remove
+        </button>
       </p>
     )
   }

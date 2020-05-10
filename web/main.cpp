@@ -2,17 +2,19 @@
 
 #include "web/handlers.h"
 
-#include "audio_transformer.h"
-#include "pedal_registry.h"
-#include "pedals/blues_drive_pedal.h"
-#include "pedals/delay_pedal.h"
-#include "playback.h"
-#include "web/pedal_board.h"
-#include "web/serializers.h"
-
 #include <fstream>
 #include <string>
 #include <vector>
+#include "audio_transformer.h"
+#include "pedal_registry.h"
+#include "pedals/blues_drive_pedal.h"
+#include "pedals/compressor_pedal.h"
+#include "pedals/delay_pedal.h"
+#include "pedals/echo_pedal.h"
+#include "pedals/fuzz_pedal.h"
+#include "playback.h"
+#include "web/pedal_board.h"
+#include "web/serializers.h"
 
 int main() {
   crow::SimpleApp app;
@@ -26,6 +28,12 @@ int main() {
       return crow::response(404);
     }
     pedal_board.AddPedal((*pedal_factory)());
+    return crow::response(200);
+  });
+
+  CROW_ROUTE(app, "/remove_pedal/<int>")
+  ([&pedal_board](const int pedal_index) {
+    pedal_board.RemovePedal(pedal_index);
     return crow::response(200);
   });
 

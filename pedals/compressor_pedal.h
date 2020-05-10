@@ -23,7 +23,7 @@ class CompressorPedal : public Pedal {
 
   PedalInfo Describe() override {
     PedalInfo info;
-    info.name = "compressor";
+    info.name = "Compressor";
     return info;
   }
 
@@ -36,7 +36,7 @@ class CompressorPedal : public Pedal {
                                                 /* sample_rate= */ 44100};
 };
 
-REGISTER_PEDAL("compressor",
+REGISTER_PEDAL("Compressor",
                []() { return std::unique_ptr<Pedal>(new CompressorPedal()); });
 
 #endif /* COMPRESSOR_PEDAL_H */
