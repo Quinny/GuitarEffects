@@ -22,10 +22,17 @@ class AvailablePedal extends React.Component {
 class PedalList extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {"pedals": []};
+  }
+
+  componentDidMount() {
+    $.get("/available_pedals").done((pedals) => {
+      this.setState({"pedals": pedals});
+    });
   }
 
   render() {
-    return this.props.pedals.map((pedal) => {
+    return this.state.pedals.map((pedal) => {
       return (<AvailablePedal name={pedal} onChange={this.props.onChange} />)
     });
   }
@@ -42,7 +49,6 @@ class Knob extends React.Component {
   }
 
   onChange(event) {
-    console.log(event.target.value);
     const knobUpdate = {
       'name': this.props.name,
       'value': event.target.value,
@@ -129,7 +135,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <PedalList pedals={["delay", "bluesdrive"]} onChange={this.refresh.bind(this)} />
+        <PedalList onChange={this.refresh.bind(this)} />
         <hr />
         <PedalBoard registerRefresh={this.registerRefreshHandler.bind(this)} />
       </div>

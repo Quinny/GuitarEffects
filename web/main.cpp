@@ -51,8 +51,19 @@ int main() {
     return crow::response(200);
   });
 
-  // TODO: Add a method which queries the registry for all pedals for the
-  // list view.
+  CROW_ROUTE(app, "/available_pedals")
+  ([&pedal_board]() {
+    const auto registered_pedals =
+        PedalRegistry::GetInstance().GetRegisteredPedals();
+    std::vector<std::string> pedal_names;
+    for (const auto& pedal_info : registered_pedals) {
+      pedal_names.push_back(pedal_info.name);
+    }
+
+    crow::json::wvalue response;
+    response = pedal_names;
+    return crow::response(response);
+  });
 
   CROW_ROUTE(app, "/<string>")
   (serve_static_files("static"));
