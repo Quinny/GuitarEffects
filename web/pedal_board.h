@@ -33,7 +33,7 @@ class PedalBoard : public Pedal {
   // TODO: this.
   PedalInfo Describe() override { return PedalInfo{}; }
 
-  std::vector<PedalInfo> GetPedals() {
+  std::vector<PedalInfo> GetPedals() const {
     std::lock_guard<std::mutex> lock(mutex_);
     std::vector<PedalInfo> pedals;
     for (const auto& pedal : pedals_) {
@@ -43,7 +43,7 @@ class PedalBoard : public Pedal {
   }
 
  private:
-  std::mutex mutex_;
+  mutable std::mutex mutex_;
   std::vector<std::unique_ptr<Pedal>> pedals_;
 };
 

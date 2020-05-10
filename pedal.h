@@ -9,6 +9,7 @@
 struct PedalKnob {
   std::string name;
   double value;
+  double tweak_amount;
 };
 
 struct PedalInfo {

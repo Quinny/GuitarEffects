@@ -12,10 +12,10 @@ class AvailablePedal extends React.Component {
 
   render() {
     return (
-      <p>
-        {this.props.name} <button class="btn btn-primary btn-small"
-                                  onClick={this.add.bind(this)}>Add</button>
-      </p>
+      <button class="btn btn-primary btn-small"
+              onClick={this.add.bind(this)}>
+        {this.props.name}
+      </button>
     )
   }
 }
@@ -40,11 +40,17 @@ class AvailablePedalList extends React.Component {
   }
 
   render() {
-    return this.state.pedals.map((pedal) => {
+    const availablePedals = this.state.pedals.map((pedal) => {
       return (<AvailablePedal
                  name={pedal}
                  onChange={this.props.onChange} />)
     });
+
+    return (
+      <div class="available-pedal-list" align="center">
+        {availablePedals}
+      </div>
+    )
   }
 }
 
@@ -54,11 +60,13 @@ class Knob extends React.Component {
     super(props);
   }
 
-  // TODO: Pass down a tweak amount from the server and apply an update based
-  // on that.
-  tweak(event) {
-    console.log("Tweaking knob " + this.props.name);
-    console.log("Value is " + event.target.value);
+  tweak(sign) {
+    const knobUpdate = {
+      'name': this.props.name,
+      'value': this.props.value + (sign * this.props.tweakAmount),
+    };
+    $.get('/adjust_knob/' + this.props.pedalIndex, knobUpdate)
+      .done(this.props.refresh);
   }
 
   // Send the knob update to the server and refresh the board.
@@ -73,18 +81,20 @@ class Knob extends React.Component {
   }
 
   render() {
-    const boundTweak = this.tweak.bind(this);
     return (
-      <p>
+      <div class="knob">
         {this.props.name}
-        <button class="btn btn-primary btn-small" onClick={boundTweak}>
-          +
-        </button>
-        <input value={this.props.value} onChange={this.onChange.bind(this)} />
-        <button class="btn btn-primary btn-small" onClick={boundTweak}>
+
+        <button class="btn btn-primary btn-small"
+                onClick={this.tweak.bind(this, -1)}>
           -
         </button>
-      </p>
+        <input value={this.props.value} onChange={this.onChange.bind(this)} />
+        <button class="btn btn-primary btn-small"
+                onClick={this.tweak.bind(this, 1)}>
+          +
+        </button>
+      </div>
     )
   }
 }
@@ -108,21 +118,26 @@ class ActivePedal extends React.Component {
           <Knob
             name={knob.name}
             value={knob.value}
+            tweakAmount={knob.tweak_amount}
             pedalIndex={this.props.index}
             refresh={this.props.refresh} />
       )
     });
 
     return (
-      <p>
-        {this.props.name}
+      <div class="active-pedal">
+        <h4 class="card-title">
+          {this.props.name}
+        </h4>
+
         {knobs}
+
         <button
           class="btn btn-danger btn-small"
           onClick={this.remove.bind(this)} >
           Remove
         </button>
-      </p>
+      </div>
     )
   }
 }
@@ -156,11 +171,19 @@ class PedalBoard extends React.Component {
   render() {
     return this.state.pedals.map((pedal, index) => {
       return (
-          <ActivePedal
-             name={pedal.name}
-             knobs={pedal.knobs}
-             index={index}
-             refresh={this.refresh.bind(this)} />
+          <div className="row">
+            <div className="col-md-8 offset-md-2 col-xs-12">
+              <div className="card">
+                <div className="card-block">
+                  <ActivePedal
+                     name={pedal.name}
+                     knobs={pedal.knobs}
+                     index={index}
+                     refresh={this.refresh.bind(this)} />
+                </div>
+              </div>
+            </div>
+          </div>
       )
     });
   }

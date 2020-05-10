@@ -8,6 +8,7 @@ crow::json::wvalue SerializePedalKnob(const PedalKnob& pedal_knob) {
   crow::json::wvalue serialized;
   serialized["name"] = pedal_knob.name;
   serialized["value"] = pedal_knob.value;
+  serialized["tweak_amount"] = pedal_knob.tweak_amount;
   return serialized;
 }
 
