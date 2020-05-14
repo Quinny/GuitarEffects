@@ -1,6 +1,12 @@
 #ifndef BLUES_DRIVE_PEDAL_H
 #define BLUES_DRIVE_PEDAL_H
 
+// biquad.h actually needs these to be imported and I'm to lazy to fork
+// cycfi's repo and actually submit these changes.
+#include "q/support/base.hpp"
+#include "q/support/frequency.hpp"
+#include "q/support/literals.hpp"
+
 #include "fx/effects_pipeline.h"
 #include "fx/wave_shaper.h"
 #include "pedal.h"

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <memory>
+#include <mutex>
 
 #include "pedal.h"
 #include "pedals/blues_drive_pedal.h"
