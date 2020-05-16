@@ -16,7 +16,7 @@ ifeq ($(UNAME), Linux)
 	# doesn't appear to cause issues.
 	COMPILE_FLAGS += -Wno-psabi
 	# Linux and OSX spell RtAudio differently for some maddening reason.
-	COMPILE_FLAGS += lrtaudio
+	COMPILE_FLAGS += -lrtaudio
 endif
 ifeq ($(UNAME), Darwin)
 	COMPILE_FLAGS += -lrtAudio
