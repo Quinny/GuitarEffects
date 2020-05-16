@@ -47,5 +47,9 @@ int main(int argc, char* argv[]) {
                       /* output_device_index= */ in_debug_mode ? 1 : 3,
                       /* treat_input_as_mono= */ !in_debug_mode);
   at.Start();
+
+  if (!in_debug_mode) {
+    app.loglevel(crow::LogLevel::WARNING);
+  }
   app.port(in_debug_mode ? 8080 : 80).run();
 }
