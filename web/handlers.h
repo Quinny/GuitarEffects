@@ -20,10 +20,12 @@ class StaticFileHandler {
   StaticFileHandler(const std::string& directory) : directory_(directory) {}
 
   crow::response operator()(const std::string& filename) const {
-    // TODO: Don't allow filenames with "." to prevent people from reading
-    // random files.
-    std::ifstream file_stream(directory_ + "/" + filename);
+    // Protect against escaping the static file directory.
+    if (filename.find("..") != std::string::npos) {
+      return crow::response(400);
+    }
 
+    std::ifstream file_stream(directory_ + "/" + filename);
     if (!file_stream) {
       return crow::response(404);
     }
@@ -37,7 +39,6 @@ class StaticFileHandler {
                 std::back_inserter(response_body));
     }
 
-    // TODO: Do I need to set the mime type?
     return crow::response(std::move(response_body));
   }
 
