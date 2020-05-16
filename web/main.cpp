@@ -8,7 +8,9 @@
 #include "web/handlers.h"
 #include "web/pedal_board.h"
 
-int main() {
+int main(int argc, char* argv[]) {
+  bool in_debug_mode = argc > 1 && strcmp(argv[1], "debug") == 0;
+
   crow::SimpleApp app;
   PedalBoard pedal_board;
 
@@ -37,12 +39,13 @@ int main() {
   CROW_ROUTE(app, "/<string>")(static_file_handler);
 
   Playback pb(/* filename= */ "../recording");
-  AudioTransformer at(
-      [&pedal_board, &pb](SignalType input) {
-        return pedal_board.Transform(pb.next());
-      },
-      3, 1, false);
-  at.Start();
+  auto transform = [in_debug_mode, &pedal_board, &pb](SignalType input) {
+    return pedal_board.Transform(in_debug_mode ? input : pb.next());
+  };
 
-  app.port(8080).run();
+  AudioTransformer at(transform, /* input_device_index= */ 3,
+                      /* output_device_index= */ in_debug_mode ? 1 : 3,
+                      /* treat_input_as_mono= */ !in_debug_mode);
+  at.Start();
+  app.port(in_debug_mode ? 8080 : 80).run();
 }

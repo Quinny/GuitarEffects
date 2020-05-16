@@ -1,7 +1,6 @@
-CLANG = clang++-3.7
+COMPILER = clang++-3.7
 
-COMPILE_FLAGS = -lrtAudio \
-								-lpthread \
+COMPILE_FLAGS = -lpthread \
 								-lboost_system \
 								-I crow/include \
 								-std=c++1z \
@@ -9,16 +8,30 @@ COMPILE_FLAGS = -lrtAudio \
 								-I cycfi/Q/q_lib/include \
 								-I cycfi/infra/include
 
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+	# Linux doesn't support clang, so swap the compiler to gcc.
+	COMPILER = g++
+	# GCC complains about some ABI differences in one of the libraries, but it
+	# doesn't appear to cause issues.
+	COMPILE_FLAGS += -Wno-psabi
+	# Linux and OSX spell RtAudio differently for some maddening reason.
+	COMPILE_FLAGS += lrtaudio
+endif
+ifeq ($(UNAME), Darwin)
+	COMPILE_FLAGS += -lrtAudio
+endif
+
 all: pedalboard record server
 
 server:
-	${CLANG} web/main.cpp ${COMPILE_FLAGS} -o ./bin/server
+	${COMPILER} web/main.cpp ${COMPILE_FLAGS} -o ./bin/server
 
 pedalboard:
-	${CLANG} pedalboard.cpp ${COMPILE_FLAGS} -o ./bin/pedalboard
+	${COMPILER} pedalboard.cpp ${COMPILE_FLAGS} -o ./bin/pedalboard
 
 record:
-	${CLANG} record.cpp ${COMPILE_FLAGS} -o ./bin/record
+	${COMPILER} record.cpp ${COMPILE_FLAGS} -o ./bin/record
 
 run: all
 	./bin/pedalboard

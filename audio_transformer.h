@@ -78,6 +78,17 @@ class AudioTransformer {
 
     audio_interface_.showWarnings(true);
 
+    switch (audio_interface_.getCurrentApi()) {
+      case RtAudio::LINUX_ALSA:
+        // Alsa doesn't appear to support passing 0 for this variable. 32 was
+        // choosen experimentally as the lowest possible value that doesn't
+        // cause Alsa to complain.
+        frames_to_buffer_ = 32;
+        break;
+      default:
+        break;
+    }
+
     audio_interface_.openStream(
         &output_stream_parameters_, &input_stream_parameters_, RTAUDIO_FLOAT32,
         sample_rate, &frames_to_buffer_, &internal::callback, &stream_settings_,
