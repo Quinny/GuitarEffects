@@ -1,10 +1,11 @@
 CLANG = clang++-3.7
 
-COMPILE_FLAGS = -lrtAudio\
+COMPILE_FLAGS = -lrtAudio \
+								-lpthread \
 								-lboost_system \
 								-I crow/include \
-								-std=c++1z\
-								-I .\
+								-std=c++1z \
+								-I . \
 								-I cycfi/Q/q_lib/include \
 								-I cycfi/infra/include
 
