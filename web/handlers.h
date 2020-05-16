@@ -98,7 +98,7 @@ class ActivePedalHandler {
     }
 
     crow::json::wvalue response;
-    response = std::move(active_pedals);
+    response["pedals"] = std::move(active_pedals);
     return response;
   }
 

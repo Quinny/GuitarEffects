@@ -161,9 +161,9 @@ class PedalBoard extends React.Component {
 
   // Refetch the active pedals from the server.
   refresh() {
-    $.get('/active_pedals').done(pedals => {
+    $.get('/active_pedals').done(response => {
       this.setState({
-        'pedals': pedals
+        'pedals': response.pedals
       });
     });
   }
