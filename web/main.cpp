@@ -29,6 +29,8 @@ int main() {
 
   StaticFileHandler static_file_handler(/* directory = */ "static");
   CROW_ROUTE(app, "/<string>")(static_file_handler);
+  CROW_ROUTE(app, "/")
+  ([&static_file_handler]() { return static_file_handler("index.html"); });
 
   Playback pb(/* filename= */ "../recording");
   AudioTransformer at(
