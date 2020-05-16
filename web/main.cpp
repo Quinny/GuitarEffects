@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 
   Playback pb(/* filename= */ "../recording");
   auto transform = [in_debug_mode, &pedal_board, &pb](SignalType input) {
-    return pedal_board.Transform(in_debug_mode ? input : pb.next());
+    return pedal_board.Transform(in_debug_mode ? pb.next() : input);
   };
 
   AudioTransformer at(transform, /* input_device_index= */ 3,
