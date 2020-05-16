@@ -1,6 +1,11 @@
 #ifndef COMPRESSOR_PEDAL_H
 #define COMPRESSOR_PEDAL_H
 
+// dynamic.hpp needs these to be included.
+#include "q/support/base.hpp"
+#include "q/support/frequency.hpp"
+#include "q/support/literals.hpp"
+
 #include "pedal.h"
 #include "pedal_registry.h"
 #include "q/fx/dynamic.hpp"

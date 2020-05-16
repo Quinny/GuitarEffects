@@ -5,9 +5,9 @@
 #include <mutex>
 
 #include "pedal.h"
-#include "pedals/blues_drive_pedal.h"
 #include "pedals/compressor_pedal.h"
 #include "pedals/delay_pedal.h"
+#include "pedals/distortion_pedal.h"
 #include "pedals/echo_pedal.h"
 #include "pedals/fuzz_pedal.h"
 
