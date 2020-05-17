@@ -52,6 +52,8 @@ class LooperPedal : public Pedal {
                   .tweak_amount = 1},
         PedalKnob{
             .name = "loop_blend", .value = loop_blend_, .tweak_amount = 0.1},
+        PedalKnob{.name = "trim_front", .value = 1, .tweak_amount = 0.1},
+        PedalKnob{.name = "trim_back", .value = 1, .tweak_amount = 0.1},
     };
     return info;
   }
@@ -70,6 +72,18 @@ class LooperPedal : public Pedal {
       loop_position_ = 0;
     } else if (pedal_knob.name == "loop_blend") {
       loop_blend_ = pedal_knob.value;
+    } else if (pedal_knob.name == "trim_front" ||
+               pedal_knob.name == "trim_back") {
+      int frames_to_trim =
+          std::min<std::size_t>(44100 * 0.2, loop_buffer_.size());
+      if (pedal_knob.name == "trim_front") {
+        loop_buffer_.erase(loop_buffer_.begin(),
+                           loop_buffer_.begin() + frames_to_trim);
+      } else {
+        loop_buffer_.erase(
+            loop_buffer_.begin() + (loop_buffer_.size() - frames_to_trim),
+            loop_buffer_.end());
+      }
     }
   }
 
