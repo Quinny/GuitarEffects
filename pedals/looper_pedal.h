@@ -87,16 +87,22 @@ class LooperPedal : public Pedal {
       loop_blend_ = pedal_knob.value;
     } else if (pedal_knob.name == "start_frame") {
       int desired_frame = static_cast<int>(pedal_knob.value);
+      // Ensure that:
+      //   0 <= start_frame < end_frame < buffer_size
       desired_frame = std::max(desired_frame, 0);
       desired_frame = std::min<int>(desired_frame, loop_buffer_.size());
       desired_frame = std::min(desired_frame, end_frame_);
+
       start_frame_ = desired_frame;
       loop_position_ = start_frame_;
     } else if (pedal_knob.name == "end_frame") {
       int desired_frame = static_cast<int>(pedal_knob.value);
+      // Ensure that:
+      //   0 <= start_frame < end_frame < buffer_size
       desired_frame = std::max(desired_frame, 0);
       desired_frame = std::max(desired_frame, start_frame_);
       desired_frame = std::min<int>(desired_frame, loop_buffer_.size());
+
       end_frame_ = desired_frame;
       loop_position_ = start_frame_;
     }
