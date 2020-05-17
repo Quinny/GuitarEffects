@@ -43,7 +43,8 @@ int main(int argc, char* argv[]) {
     return pedal_board.Transform(in_debug_mode ? pb.next() : input);
   };
 
-  AudioTransformer at(transform, /* input_device_index= */ 3,
+  AudioTransformer at(transform,
+                      /* input_device_index= */ in_debug_mode ? 2 : 3,
                       /* output_device_index= */ in_debug_mode ? 1 : 3,
                       /* treat_input_as_mono= */ !in_debug_mode);
   at.Start();

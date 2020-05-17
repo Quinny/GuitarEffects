@@ -77,6 +77,7 @@ int main() {
       /* input_device_index= */ 3, /* output_device_index= */ 1,
       /* treat_input_as_mono= */ false);
   at.DumpDeviceInfo();
+
   at.Start();
 
   while (1) {
