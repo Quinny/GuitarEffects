@@ -74,8 +74,8 @@ class LooperPedal : public Pedal {
       loop_blend_ = pedal_knob.value;
     } else if (pedal_knob.name == "trim_front" ||
                pedal_knob.name == "trim_back") {
-      int frames_to_trim =
-          std::min<std::size_t>(44100 * 0.2, loop_buffer_.size());
+      loop_position_ = 0;
+      int frames_to_trim = std::min<std::size_t>(44100, loop_buffer_.size());
       if (pedal_knob.name == "trim_front") {
         loop_buffer_.erase(loop_buffer_.begin(),
                            loop_buffer_.begin() + frames_to_trim);
