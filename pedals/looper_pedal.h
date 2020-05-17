@@ -4,6 +4,7 @@
 #include "pedal_registry.h"
 #include "signal_type.h"
 
+#include <string>
 #include <vector>
 
 // Records input signal and then re-loops it back continually.
@@ -32,6 +33,7 @@ class LooperPedal : public Pedal {
         loop_position_ = (loop_position_ + 1) % loop_buffer_.size();
         return output;
     }
+    return signal;
   }
 
   PedalInfo Describe() override {
@@ -66,7 +68,7 @@ class LooperPedal : public Pedal {
     } else if (pedal_knob.name == "replay") {
       mode_ = Mode::REPLAY;
       loop_position_ = 0;
-    } else if (pedal_knob.name = "loop_blend") {
+    } else if (pedal_knob.name == "loop_blend") {
       loop_blend_ = pedal_knob.value;
     }
   }
