@@ -9,6 +9,7 @@
 #include "pedals/echo_pedal.h"
 #include "pedals/fuzz_pedal.h"
 #include "pedals/looper_pedal.h"
+#include "pedals/wav_looper.h"
 #include "web/pedal_board.h"
 #include "web/serializers.h"
 

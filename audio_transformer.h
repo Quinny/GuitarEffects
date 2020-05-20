@@ -20,7 +20,7 @@ struct StreamSettings {
 int callback(void* output_buffer, void* input_buffer,
              unsigned int buffered_frames, double /* stream_time */,
              RtAudioStreamStatus status, void* data) {
-  if (status) std::cout << "Stream over/underflow detected." << std::endl;
+  // if (status) std::cout << "Stream over/underflow detected." << std::endl;
 
   auto* input = (SignalType*)input_buffer;
   auto* output = (SignalType*)output_buffer;

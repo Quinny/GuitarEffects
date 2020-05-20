@@ -13,3 +13,7 @@
 [submodule "Crow"]
   path = crow
   url = https://github.com/ipkn/crow
+
+[submodule "AudioFile"]
+  path = AudioFile
+  url = https://github.com/adamstark/AudioFile
