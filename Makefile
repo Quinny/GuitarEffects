@@ -22,13 +22,10 @@ ifeq ($(UNAME), Darwin)
 	COMPILE_FLAGS += -lrtAudio
 endif
 
-all: pedalboard record server
+all: record server
 
 server:
 	${COMPILER} web/main.cpp ${COMPILE_FLAGS} -o ./bin/server
-
-pedalboard:
-	${COMPILER} pedalboard.cpp ${COMPILE_FLAGS} -o ./bin/pedalboard
 
 record:
 	${COMPILER} record.cpp ${COMPILE_FLAGS} -o ./bin/record
