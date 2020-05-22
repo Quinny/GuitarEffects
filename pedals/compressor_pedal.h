@@ -41,6 +41,9 @@ class CompressorPedal : public Pedal {
             .name = "attack", .value = attack_seconds_, .tweak_amount = 0.1},
         PedalKnob{
             .name = "release", .value = release_seconds_, .tweak_amount = 0.1},
+        PedalKnob{
+            .name = "threshold", .value = threshold_, .tweak_amount = 0.1},
+        PedalKnob{.name = "ratio", .value = ratio_, .tweak_amount = 0.1},
     };
     return info;
   }
@@ -50,19 +53,27 @@ class CompressorPedal : public Pedal {
       attack_seconds_ = pedal_knob.value;
     } else if (pedal_knob.name == "release") {
       release_seconds_ = pedal_knob.value;
+    } else if (pedal_knob.name == "threshold") {
+      threshold_ = pedal_knob.value;
+    } else if (pedal_knob.name == "ratio") {
+      ratio_ = pedal_knob.value;
     }
 
-    envelope_tracker_ =
-        cycfi::q::envelope_follower(attack_seconds_, release_seconds_,
-                                    /* sample_rate= */ 44100);
+    envelope_tracker_ = {attack_seconds_, release_seconds_,
+                         /* sample_rate= */ 44100};
+    compressor_ = {threshold_, ratio_};
   }
 
  private:
   double attack_seconds_;
   double release_seconds_;
-  cycfi::q::compressor compressor_{/* threshold= */ 0.1,
-                                   /* ratio= */ 0.1};
-  cycfi::q::envelope_follower envelope_tracker_;
+  float threshold_ = 0.1;
+  float ratio_ = 0.1;
+
+  cycfi::q::compressor compressor_{threshold_, ratio_};
+  cycfi::q::envelope_follower envelope_tracker_{attack_seconds_,
+                                                release_seconds_,
+                                                /* sample_rate= */ 44100};
 };
 
 REGISTER_PEDAL("Compressor", []() {
