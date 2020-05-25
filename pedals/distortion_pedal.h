@@ -44,13 +44,15 @@ class DistortionPedal : public Pedal {
 
     bandpass_ = {frequency_hz_, kSampleRate};
     lowpass_ = {frequency_hz_, kSampleRate};
-    curve_ = [this](int x) { return std::tanh(std::pow(x, 1 - drive_)); };
-    wave_shaper = {curve_, static_cast<int>(curve_sample_)};
+    auto curve = [this](int x) { return NonLinearity(x); };
+    wave_shaper = {curve, static_cast<int>(curve_sample_)};
 
     pipeline_ = {{bandpass_, wave_shaper, lowpass_}};
   }
 
  private:
+  SignalType NonLinearity(int x) { return (1 / (1 + std::abs(x))) * drive_; }
+
   static constexpr int kSampleRate = 44100;
   double frequency_hz_ = 1000;
   double drive_ = 0.2;
@@ -58,10 +60,8 @@ class DistortionPedal : public Pedal {
 
   cycfi::q::bandpass_csg bandpass_{frequency_hz_, kSampleRate};
   cycfi::q::lowpass lowpass_{frequency_hz_, kSampleRate};
-  std::function<SignalType(int)> curve_ = [this](int x) {
-    return std::tanh(std::pow(x, 1 - drive_));
-  };
-  WaveShaper wave_shaper{curve_, static_cast<int>(curve_sample_)};
+  WaveShaper wave_shaper{[this](int x) { return NonLinearity(x); },
+                         static_cast<int>(curve_sample_)};
 
   EffectsPipeline pipeline_{{bandpass_, wave_shaper, lowpass_}};
 };
