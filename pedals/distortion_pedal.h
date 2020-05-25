@@ -60,8 +60,8 @@ class DistortionPedal : public Pedal {
 
   cycfi::q::bandpass_csg bandpass_{frequency_hz_, kSampleRate};
   cycfi::q::lowpass lowpass_{frequency_hz_, kSampleRate};
-  WaveShaper wave_shaper{[this](int x) { return NonLinearity(x); },
-                         static_cast<int>(curve_sample_)};
+  WaveShaper wave_shaper_{[this](int x) { return NonLinearity(x); },
+                          static_cast<int>(curve_sample_)};
 
   EffectsPipeline pipeline_{{bandpass_, wave_shaper_, lowpass_}};
 };
