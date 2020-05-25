@@ -45,9 +45,9 @@ class DistortionPedal : public Pedal {
     bandpass_ = {frequency_hz_, kSampleRate};
     lowpass_ = {frequency_hz_, kSampleRate};
     auto curve = [this](int x) { return NonLinearity(x); };
-    wave_shaper = {curve, static_cast<int>(curve_sample_)};
+    wave_shaper_ = {curve, static_cast<int>(curve_sample_)};
 
-    pipeline_ = {{bandpass_, wave_shaper, lowpass_}};
+    pipeline_ = {{bandpass_, wave_shaper_, lowpass_}};
   }
 
  private:
@@ -63,7 +63,7 @@ class DistortionPedal : public Pedal {
   WaveShaper wave_shaper{[this](int x) { return NonLinearity(x); },
                          static_cast<int>(curve_sample_)};
 
-  EffectsPipeline pipeline_{{bandpass_, wave_shaper, lowpass_}};
+  EffectsPipeline pipeline_{{bandpass_, wave_shaper_, lowpass_}};
 };
 
 REGISTER_PEDAL("Distortion",
