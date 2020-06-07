@@ -18,11 +18,11 @@ class AutoWahPedal : public Pedal {
   }
 
   SignalType Transform(SignalType signal) override {
-    // TODO: Figure out how to adjust the cutoff with an envelope tracker.
-    // First attempt did not produce fast enough modulation, so i used a fixed
-    // length period.
+    // Scale the frequency of the modulation with the envelope (volume) of the
+    // playing.
+    auto env = envelope_tracker_(std::abs(signal));
+    current_cut_off_ += frequency_increment_ * (1 + env);
 
-    current_cut_off_ += frequency_increment_;
     if (current_cut_off_ > max_frequency_ ||
         current_cut_off_ < min_frequency_) {
       frequency_increment_ = -frequency_increment_;
@@ -78,6 +78,12 @@ class AutoWahPedal : public Pedal {
 
   cycfi::q::lowpass lowpass_{3000, 44100};
   cycfi::q::bandpass_csg bandpass_{3000, 44100};
+
+  // Set attack and release very low so they respond quickly to playing
+  // dynamics.
+  cycfi::q::envelope_follower envelope_tracker_{/* attack_seconds= */ 0.015,
+                                                /* release_seconds= */ 0.015,
+                                                /* sample_rate= */ 44100};
 
   double max_frequency_ = 2000;
   double min_frequency_ = 20;
