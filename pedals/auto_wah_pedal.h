@@ -23,7 +23,10 @@ class AutoWahPedal : public Pedal {
     // length period.
 
     current_cut_off_ += frequency_increment_;
-    if (current_cut_off_ > max_frequency_) current_cut_off_ = min_frequency_;
+    if (current_cut_off_ > max_frequency_ ||
+        current_cut_off_ < min_frequency_) {
+      frequency_increment_ = -frequency_increment_;
+    }
 
     lowpass_.config(current_cut_off_, 44100);
     bandpass_.config(current_cut_off_, 44100);
