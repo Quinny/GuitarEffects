@@ -34,7 +34,7 @@ class AvailablePedalList extends React.Component {
     $.get("/available_pedals")
       .done((pedals) => {
         this.setState({
-          "pedals": pedals,
+          "pedals": pedals.sort(),
         });
       });
   }
