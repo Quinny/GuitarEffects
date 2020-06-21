@@ -40,11 +40,11 @@ class FuzzPedal : public Pedal {
       frequency_multipler_ = pedal_knob.value;
     }
 
-    shaper_ = {[this](int x) { return Curve(x); }, 4096};
+    shaper_ = {[this](SignalType x) { return Curve(x); }, 4096};
   }
 
  private:
-  SignalType Curve(int x) {
+  SignalType Curve(SignalType x) {
     auto y = std::tanh(x) * boost_;
     auto clipped = std::max<double>(std::min<double>(y, 1), -1);
     return clipped;
@@ -54,7 +54,7 @@ class FuzzPedal : public Pedal {
   double frequency_multipler_ = 2;
 
   cycfi::q::bandpass_csg bandpass_{1200, 44100};
-  WaveShaper shaper_{[this](int x) { return Curve(x); }, 4096};
+  WaveShaper shaper_{[this](SignalType x) { return Curve(x); }, 4096};
 };
 
 REGISTER_PEDAL("Fuzz",

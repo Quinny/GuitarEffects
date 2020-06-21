@@ -11,7 +11,7 @@ class WaveShaperPedal : public Pedal {
   virtual std::string GetName() = 0;
 
   // The curve functon which will be used for the basis of shaping.
-  virtual SignalType Curve(int x) = 0;
+  virtual SignalType Curve(SignalType x) = 0;
 
   SignalType Transform(SignalType input) override {
     return wave_shaper_(input);
@@ -49,7 +49,7 @@ class WaveShaperPedal : public Pedal {
 
  protected:
   void Update() {
-    wave_shaper_ = {[this](int x) {
+    wave_shaper_ = {[this](SignalType x) {
                       return Curve(x * period_multiplier_) *
                              amplitude_multiplier_;
                     },
@@ -60,7 +60,7 @@ class WaveShaperPedal : public Pedal {
   int curve_points_ = 4096;
   double amplitude_multiplier_ = 0.7;
   double period_multiplier_ = 1;
-  WaveShaper wave_shaper_{[](int x) { return x; }, curve_points_};
+  WaveShaper wave_shaper_{[](SignalType x) { return x; }, curve_points_};
 };
 
 #endif /* WAVE_SHAPER_PEDAL_H */

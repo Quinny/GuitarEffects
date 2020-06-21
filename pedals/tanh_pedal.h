@@ -9,7 +9,7 @@ class TanhPedal : public WaveShaperPedal {
   TanhPedal() { Update(); }
 
   std::string GetName() override { return "TanhPedal"; }
-  SignalType Curve(int x) override { return std::tanh(x); }
+  SignalType Curve(SignalType x) override { return std::tanh(x); }
 };
 
 REGISTER_PEDAL("TanhPedal",

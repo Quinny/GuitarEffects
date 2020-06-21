@@ -13,10 +13,13 @@
 // https://chromium.googlesource.com/chromium/blink/+/master/Source/modules/webaudio/WaveShaperDSPKernel.cpp
 class WaveShaper {
  public:
-  WaveShaper(std::function<SignalType(int)> curve_generator,
-             int points_to_generate) {
+  WaveShaper(std::function<SignalType(SignalType)> curve_generator,
+             int points_to_generate, int start_x = -200, int end_x = 200) {
+    int distance = end_x - start_x;
+    double step = distance / (points_to_generate * 1.0);
+
     for (int point = 0; point < points_to_generate; ++point) {
-      curve_.push_back(curve_generator(point * 2 / (points_to_generate - 1)));
+      curve_.push_back(curve_generator(start_x + (point * step)));
     }
   }
 

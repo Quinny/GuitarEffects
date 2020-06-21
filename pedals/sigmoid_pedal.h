@@ -9,7 +9,7 @@ class SigmoidPedal : public WaveShaperPedal {
   SigmoidPedal() { Update(); }
 
   std::string GetName() override { return "SigmoidPedal"; }
-  SignalType Curve(int x) override { return (1 / (1 + std::abs(x))); }
+  SignalType Curve(SignalType x) override { return (x / (1 + std::abs(x))); }
 };
 
 REGISTER_PEDAL("SigmoidPedal",
