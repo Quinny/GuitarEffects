@@ -8,6 +8,10 @@ COMPILE_FLAGS = -lpthread \
 								-I cycfi/Q/q_lib/include \
 								-I cycfi/infra/include
 
+MATPLOT_FLAGS = -I/usr/include/python2.7 \
+								-I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include \
+								-lpython2.7
+
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
 	# Linux doesn't support clang, so swap the compiler to gcc.
@@ -23,6 +27,9 @@ ifeq ($(UNAME), Darwin)
 endif
 
 all: record server
+
+plot:
+	${COMPILER} plot.cpp ${COMPILE_FLAGS} ${MATPLOT_FLAGS} -o ./bin/plot
 
 server:
 	${COMPILER} web/main.cpp ${COMPILE_FLAGS} -o ./bin/server

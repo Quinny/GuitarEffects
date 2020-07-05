@@ -28,6 +28,8 @@ class Playback {
     return signal;
   }
 
+  const std::vector<SignalType>& frames() { return frames_; }
+
  private:
   std::vector<SignalType> frames_;
   int next_frame_ = 0;
