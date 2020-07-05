@@ -32,6 +32,8 @@ int main() {
 
   // Plot the clean signal.
   matplotlibcpp::named_plot("Clean", xs, pb.frames());
+  std::vector<SignalType> origin_v(pb.frames().size(), 0);
+  matplotlibcpp::plot(xs, origin_v, "--k");
 
   // Plot each pedal signal and offset by 3 to prevent the graphs from
   // overlapping.
@@ -40,8 +42,12 @@ int main() {
     const auto pedal_name = pedal->Describe().name;
     matplotlibcpp::named_plot(pedal_name, xs,
                               ApplyPedal(pb.frames(), *pedal, offset));
-    std::vector<SignalType> offset_v(pb.frames().size(), offset - 1.5);
-    matplotlibcpp::plot(xs, offset_v, "--r");
+
+    std::vector<SignalType> limit_v(pb.frames().size(), offset - 1.5);
+    matplotlibcpp::plot(xs, limit_v, "--k");
+
+    std::vector<SignalType> origin_v(pb.frames().size(), offset);
+    matplotlibcpp::plot(xs, origin_v, "--k");
     offset += 3;
   }
 
