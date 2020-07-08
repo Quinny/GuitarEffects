@@ -6,7 +6,8 @@ COMPILE_FLAGS = -lpthread \
 								-std=c++1z \
 								-I . \
 								-I cycfi/Q/q_lib/include \
-								-I cycfi/infra/include
+								-I cycfi/infra/include \
+								-lsdl2
 
 MATPLOT_FLAGS = -I/usr/include/python2.7 \
 								-I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include \

@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "visualization/visualizer.h"
+
 #include "audio_transformer.h"
 #include "crow.h"
 #include "playback.h"
@@ -38,9 +40,15 @@ int main(int argc, char* argv[]) {
   StaticFileHandler static_file_handler(/* directory = */ "static");
   CROW_ROUTE(app, "/<string>")(static_file_handler);
 
+  FrameBuffer frame_buffer(/* max_size= */ 44100);
+  Visualizer v(&frame_buffer, /* fps= */ 30);
+
   Playback pb(/* filename= */ "../recording");
-  auto transform = [in_debug_mode, &pedal_board, &pb](SignalType input) {
-    return pedal_board.Transform(in_debug_mode ? pb.next() : input);
+  auto transform = [in_debug_mode, &pedal_board, &pb,
+                    &frame_buffer](SignalType input) {
+    auto out = pedal_board.Transform(in_debug_mode ? pb.next() : input);
+    frame_buffer.Add(out);
+    return out;
   };
 
   AudioTransformer at(transform,
@@ -52,5 +60,8 @@ int main(int argc, char* argv[]) {
   if (!in_debug_mode) {
     app.loglevel(crow::LogLevel::WARNING);
   }
-  app.port(in_debug_mode ? 8080 : 80).run();
+
+  std::thread app_thread([&]() { app.port(in_debug_mode ? 8080 : 80).run(); });
+  v.BlockingStart();
+  app_thread.join();
 }
