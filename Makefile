@@ -6,8 +6,7 @@ COMPILE_FLAGS = -lpthread \
 								-std=c++1z \
 								-I . \
 								-I cycfi/Q/q_lib/include \
-								-I cycfi/infra/include \
-								-lsdl2
+								-I cycfi/infra/include
 
 MATPLOT_FLAGS = -I/usr/include/python2.7 \
 								-I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include \
@@ -22,9 +21,12 @@ ifeq ($(UNAME), Linux)
 	COMPILE_FLAGS += -Wno-psabi
 	# Linux and OSX spell RtAudio differently for some maddening reason.
 	COMPILE_FLAGS += -lrtaudio
+	# Linux and OSX link in SDL2 differently
+	COMPILE_FLAGS += `sdl2-config --cflags --libs`
 endif
 ifeq ($(UNAME), Darwin)
 	COMPILE_FLAGS += -lrtAudio
+	COMPILE_FLAGS += -lsdl2
 endif
 
 all: record server
