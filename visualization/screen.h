@@ -18,7 +18,16 @@ class Screen {
     window_.reset(SDL_CreateWindow(title.c_str(), /* x= */ 0, /* y= */ 0,
                                    width_, height_, SDL_WINDOW_SHOWN));
     window_surface_.reset(SDL_GetWindowSurface(window_.get()));
+
+// For some reason unknown to me, the window renderer needs to be created
+// in a different way depending on the platform. Doing it the wrong way
+// will result in a window which is never updated.
+#ifdef __APPLE__
     renderer_.reset(SDL_GetRenderer(window_.get()));
+#else
+    renderer_.reset(
+        SDL_CreateRenderer(window_.get(), /* index = */ -1, /* flags= */ 0));
+#endif
   }
 
   int width() { return width_; }
