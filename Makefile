@@ -1,4 +1,4 @@
-COMPILER = clang++-3.7
+COMPILER = g++
 
 COMPILE_FLAGS = -lpthread \
 								-lboost_system \

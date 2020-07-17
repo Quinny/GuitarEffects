@@ -80,8 +80,12 @@ The web UI uses [React](https://reactjs.org). The bulk of the logic lives in
 building on. See [install.txt](https://github.com/thestk/rtaudio/blob/master/install.txt) from the RtAudio repo. After following all the steps there run `make install` in the RtAudio directory so that the library files can be linked properly.
 
 1. Install boost using your package manager (e.g. `brew`, `apt-get`, `yum`, etc).
-If you google "Install boost using `<package_manager>` you should find the
+If you Google "Install boost using `<package_manager>` you should find the
 corresponding package name.
+
+1. Install sdl2 using your package manager (e.g. `brew`, `apt-get`, `yum`, etc.).
+If you Google "Install sdl on `<platform>` you should find more detailed
+instructions.
 
 1. Run `make server` from this repo's root.
 
