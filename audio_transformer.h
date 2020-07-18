@@ -98,10 +98,11 @@ class AudioTransformer {
   void Start() { audio_interface_.startStream(); }
   void Abort() { audio_interface_.abortStream(); }
 
-  void DumpDeviceInfo() {
-    unsigned int devices = audio_interface_.getDeviceCount();
+  static void DumpDeviceInfo() {
+    RtAudio audio_interface;
+    unsigned int devices = audio_interface.getDeviceCount();
     for (unsigned int i = 0; i < devices; i++) {
-      auto info = audio_interface_.getDeviceInfo(i);
+      auto info = audio_interface.getDeviceInfo(i);
       if (info.probed == true) {
         std::cout << "device ID = " << i << std::endl;
         std::cout << "device name: " << info.name << std::endl;

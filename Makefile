@@ -14,8 +14,6 @@ MATPLOT_FLAGS = -I/usr/include/python2.7 \
 
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
-	# Linux doesn't support clang, so swap the compiler to gcc.
-	COMPILER = g++
 	# GCC complains about some ABI differences in one of the libraries, but it
 	# doesn't appear to cause issues.
 	COMPILE_FLAGS += -Wno-psabi
