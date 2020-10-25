@@ -11,7 +11,7 @@
 #include "q/fx/envelope.hpp"
 
 class AutoWahPedal : public Pedal {
- public:
+public:
   AutoWahPedal() {
     // Force computation of the frequency increment right away.
     AdjustKnob(PedalKnob{});
@@ -21,7 +21,7 @@ class AutoWahPedal : public Pedal {
     // Scale the frequency of the modulation with the envelope (volume) of the
     // playing.
     auto env = envelope_tracker_(std::abs(signal));
-    current_cut_off_ += frequency_increment_ * (1 + env);
+    current_cut_off_ += frequency_increment_ * ((1 + env) * responsiveness_);
 
     if (current_cut_off_ > max_frequency_ ||
         current_cut_off_ < min_frequency_) {
@@ -54,6 +54,11 @@ class AutoWahPedal : public Pedal {
             .value = period_length_seconds_,
             .tweak_amount = 0.1,
         },
+        PedalKnob{
+            .name = "responsiveness",
+            .value = responsiveness_,
+            .tweak_amount = 0.1,
+        },
     };
     return info;
   }
@@ -65,6 +70,8 @@ class AutoWahPedal : public Pedal {
       min_frequency_ = knob.value;
     } else if (knob.name == "period_length_seconds") {
       period_length_seconds_ = knob.value;
+    } else if (knob.name == "responsiveness") {
+      responsiveness_ = knob.value;
     }
 
     // min + ((length * 44100) * increment) = max
@@ -90,6 +97,7 @@ class AutoWahPedal : public Pedal {
   double frequency_increment_;
   double period_length_seconds_ = 1.2;
   double current_cut_off_ = min_frequency_;
+  double responsiveness_ = 1;
 };
 
 REGISTER_PEDAL("AutoWah",
