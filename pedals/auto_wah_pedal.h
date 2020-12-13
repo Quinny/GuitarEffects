@@ -17,6 +17,10 @@ public:
     AdjustKnob(PedalKnob{});
   }
 
+  // The filter which is applied to the signal for modulation. BOTH runs the
+  // signal through a lowpass and then a bandpass.
+  enum FilterType { LOWPASS = 0, BANDPASS = 1, BOTH = 2 };
+
   SignalType Transform(SignalType signal) override {
     // Scale the frequency of the modulation with the envelope (volume) of the
     // playing.
@@ -31,7 +35,14 @@ public:
     lowpass_.config(current_cut_off_, 44100);
     bandpass_.config(current_cut_off_, 44100);
 
-    return bandpass_(lowpass_(signal));
+    switch (filter_) {
+    case LOWPASS:
+      return lowpass_(signal);
+    case BANDPASS:
+      return bandpass_(signal);
+    case BOTH:
+      return bandpass_(lowpass_(signal));
+    }
   }
 
   PedalInfo Describe() override {
@@ -59,6 +70,21 @@ public:
             .value = responsiveness_,
             .tweak_amount = 0.1,
         },
+        PedalKnob{
+            .name = "lowpass",
+            .value = static_cast<double>(filter_ == LOWPASS),
+            .tweak_amount = 1.0,
+        },
+        PedalKnob{
+            .name = "bandpass",
+            .value = static_cast<double>(filter_ == BANDPASS),
+            .tweak_amount = 1.0,
+        },
+        PedalKnob{
+            .name = "both",
+            .value = static_cast<double>(filter_ == BOTH),
+            .tweak_amount = 1.0,
+        },
     };
     return info;
   }
@@ -72,6 +98,12 @@ public:
       period_length_seconds_ = knob.value;
     } else if (knob.name == "responsiveness") {
       responsiveness_ = knob.value;
+    } else if (knob.name == "lowpass") {
+      filter_ = LOWPASS;
+    } else if (knob.name == "bandpass") {
+      filter_ = BANDPASS;
+    } else if (knob.name == "both") {
+      filter_ = BOTH;
     }
 
     // min + ((length * 44100) * increment) = max
@@ -98,6 +130,7 @@ public:
   double period_length_seconds_ = 1.2;
   double current_cut_off_ = min_frequency_;
   double responsiveness_ = 1;
+  FilterType filter_ = BOTH;
 };
 
 REGISTER_PEDAL("AutoWah",
