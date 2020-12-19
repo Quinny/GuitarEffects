@@ -25,15 +25,14 @@ public:
     // Scale the frequency of the modulation with the envelope (volume) of the
     // playing.
     auto env = envelope_tracker_(std::abs(signal));
-    current_cut_off_ += frequency_increment_ * ((1 + env) * responsiveness_);
 
+    current_cut_off_ += frequency_increment_ * (1 + (env * responsiveness_));
     if (current_cut_off_ > max_frequency_ ||
         current_cut_off_ < min_frequency_) {
       frequency_increment_ = -frequency_increment_;
     }
-
-    lowpass_.config(current_cut_off_, 44100);
-    bandpass_.config(current_cut_off_, 44100);
+    lowpass_.config(current_cut_off_, 44100, q_);
+    bandpass_.config(current_cut_off_, 44100, q_);
 
     switch (filter_) {
     case LOWPASS:
@@ -71,6 +70,11 @@ public:
             .tweak_amount = 0.1,
         },
         PedalKnob{
+            .name = "q",
+            .value = q_,
+            .tweak_amount = 0.1,
+        },
+        PedalKnob{
             .name = "lowpass",
             .value = static_cast<double>(filter_ == LOWPASS),
             .tweak_amount = 1.0,
@@ -98,6 +102,8 @@ public:
       period_length_seconds_ = knob.value;
     } else if (knob.name == "responsiveness") {
       responsiveness_ = knob.value;
+    } else if (knob.name == "q") {
+      q_ = knob.value;
     } else if (knob.name == "lowpass") {
       filter_ = LOWPASS;
     } else if (knob.name == "bandpass") {
@@ -111,12 +117,12 @@ public:
     // increment = (max - min) / (length * 44100)
     frequency_increment_ =
         (max_frequency_ - min_frequency_) / (period_length_seconds_ * 44100);
-    lowpass_ = {max_frequency_, 44100};
-    bandpass_ = {max_frequency_, 44100};
+    lowpass_ = {max_frequency_, 44100, q_};
+    bandpass_ = {max_frequency_, 44100, q_};
   }
 
-  cycfi::q::lowpass lowpass_{3000, 44100};
-  cycfi::q::bandpass_csg bandpass_{3000, 44100};
+  cycfi::q::lowpass lowpass_{3000, 44100, 1.0};
+  cycfi::q::bandpass_csg bandpass_{3000, 44100, 1.0};
 
   // Set attack and release very low so they respond quickly to playing
   // dynamics.
@@ -130,6 +136,7 @@ public:
   double period_length_seconds_ = 1.2;
   double current_cut_off_ = min_frequency_;
   double responsiveness_ = 1;
+  double q_ = 1.0;
   FilterType filter_ = BOTH;
 };
 
