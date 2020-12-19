@@ -17,31 +17,19 @@ public:
     AdjustKnob(PedalKnob{});
   }
 
-  // The filter which is applied to the signal for modulation. BOTH runs the
-  // signal through a lowpass and then a bandpass.
-  enum FilterType { LOWPASS = 0, BANDPASS = 1, BOTH = 2 };
-
   SignalType Transform(SignalType signal) override {
-    // Scale the frequency of the modulation with the envelope (volume) of the
-    // playing.
     auto env = envelope_tracker_(std::abs(signal));
 
-    current_cut_off_ += frequency_increment_ * (1 + (env * responsiveness_));
-    if (current_cut_off_ > max_frequency_ ||
-        current_cut_off_ < min_frequency_) {
-      frequency_increment_ = -frequency_increment_;
-    }
-    lowpass_.config(current_cut_off_, 44100, q_);
-    bandpass_.config(current_cut_off_, 44100, q_);
+    // Sweep the filter cutoff proportional to the envelope (volume) of the
+    // playing.
+    auto cut_off = min_frequency_ +
+                   (max_frequency_ - min_frequency_) * (env * responsiveness_);
+    lowpass_.config(cut_off, 44100, q_);
+    bandpass_.config(cut_off, 44100, q_);
 
-    switch (filter_) {
-    case LOWPASS:
-      return lowpass_(signal);
-    case BANDPASS:
-      return bandpass_(signal);
-    case BOTH:
-      return bandpass_(lowpass_(signal));
-    }
+    // Mix the output of the filters with the dry signal.
+    auto filter_signal = bandpass_(lowpass_(signal));
+    return (filter_mix_ * filter_signal) + (1 - filter_mix_) * signal;
   }
 
   PedalInfo Describe() override {
@@ -60,11 +48,6 @@ public:
             .tweak_amount = 100,
         },
         PedalKnob{
-            .name = "period_length_seconds",
-            .value = period_length_seconds_,
-            .tweak_amount = 0.1,
-        },
-        PedalKnob{
             .name = "responsiveness",
             .value = responsiveness_,
             .tweak_amount = 0.1,
@@ -75,19 +58,9 @@ public:
             .tweak_amount = 0.1,
         },
         PedalKnob{
-            .name = "lowpass",
-            .value = static_cast<double>(filter_ == LOWPASS),
-            .tweak_amount = 1.0,
-        },
-        PedalKnob{
-            .name = "bandpass",
-            .value = static_cast<double>(filter_ == BANDPASS),
-            .tweak_amount = 1.0,
-        },
-        PedalKnob{
-            .name = "both",
-            .value = static_cast<double>(filter_ == BOTH),
-            .tweak_amount = 1.0,
+            .name = "filter_mix",
+            .value = filter_mix_,
+            .tweak_amount = 0.1,
         },
     };
     return info;
@@ -98,25 +71,14 @@ public:
       max_frequency_ = knob.value;
     } else if (knob.name == "min_frequency_hz") {
       min_frequency_ = knob.value;
-    } else if (knob.name == "period_length_seconds") {
-      period_length_seconds_ = knob.value;
     } else if (knob.name == "responsiveness") {
       responsiveness_ = knob.value;
     } else if (knob.name == "q") {
       q_ = knob.value;
-    } else if (knob.name == "lowpass") {
-      filter_ = LOWPASS;
-    } else if (knob.name == "bandpass") {
-      filter_ = BANDPASS;
-    } else if (knob.name == "both") {
-      filter_ = BOTH;
+    } else if (knob.name == "filter_mix") {
+      filter_mix_ = knob.value;
     }
 
-    // min + ((length * 44100) * increment) = max
-    // length * 44100 * increment = max - min
-    // increment = (max - min) / (length * 44100)
-    frequency_increment_ =
-        (max_frequency_ - min_frequency_) / (period_length_seconds_ * 44100);
     lowpass_ = {max_frequency_, 44100, q_};
     bandpass_ = {max_frequency_, 44100, q_};
   }
@@ -132,12 +94,9 @@ public:
 
   double max_frequency_ = 2000;
   double min_frequency_ = 20;
-  double frequency_increment_;
-  double period_length_seconds_ = 1.2;
-  double current_cut_off_ = min_frequency_;
-  double responsiveness_ = 1;
-  double q_ = 1.0;
-  FilterType filter_ = BOTH;
+  double responsiveness_ = 2.5;
+  double q_ = 2.5;
+  double filter_mix_ = 1.0;
 };
 
 REGISTER_PEDAL("AutoWah",
