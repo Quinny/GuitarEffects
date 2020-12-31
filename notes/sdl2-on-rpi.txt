@@ -1,0 +1,6 @@
+Switch to using kms driver using raspi-config
+
+sudo apt-get install libxext-dev
+
+ ./configure --enable-video-kmsdrm
+

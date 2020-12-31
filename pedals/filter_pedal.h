@@ -5,9 +5,8 @@
 #include "signal_type.h"
 
 // A base class for standard filtering pedals (e.g. lowpass, bandpass, etc.).
-template <typename FilterType>
-class FilterPedal : public Pedal {
- public:
+template <typename FilterType> class FilterPedal : public Pedal {
+public:
   virtual std::string GetName() = 0;
 
   SignalType Transform(SignalType input) override { return filter_(input); }
@@ -21,7 +20,10 @@ class FilterPedal : public Pedal {
             .name = "cut_off_hz", .value = cut_off_hz_, .tweak_amount = 100},
         PedalKnob{.name = "sample_rate",
                   .value = static_cast<double>(sample_rate_),
-                  .tweak_amount = 100}};
+                  .tweak_amount = 100},
+        PedalKnob{
+            .name = "q", .value = static_cast<double>(q_), .tweak_amount = 0.1},
+    };
     return info;
   }
 
@@ -30,14 +32,17 @@ class FilterPedal : public Pedal {
       cut_off_hz_ = pedal_knob.value;
     } else if (pedal_knob.name == "sample_rate") {
       sample_rate_ = static_cast<unsigned int>(pedal_knob.value);
+    } else if (pedal_knob.name == "q") {
+      q_ = pedal_knob.value;
     }
 
-    filter_ = {cut_off_hz_, sample_rate_};
+    filter_ = {cut_off_hz_, sample_rate_, q_};
   }
 
- private:
+private:
   unsigned int sample_rate_ = 44100;
   double cut_off_hz_ = 1000;
+  double q_ = 0.7;
   FilterType filter_{cut_off_hz_, sample_rate_};
 };
 
