@@ -22,6 +22,9 @@ int main(int argc, char* argv[]) {
   RemovePedalHandler remove_pedal_handler(&pedal_board);
   CROW_ROUTE(app, "/remove_pedal/<int>")(remove_pedal_handler);
 
+  PushButtonHandler push_button_handler(&pedal_board);
+  CROW_ROUTE(app, "/push_button/<int>")(push_button_handler);
+
   ActivePedalHandler active_pedal_handler(&pedal_board);
   CROW_ROUTE(app, "/active_pedals")(active_pedal_handler);
 
@@ -53,7 +56,7 @@ int main(int argc, char* argv[]) {
 
   AudioTransformer::DumpDeviceInfo();
   AudioTransformer at(transform,
-                      /* input_device_index= */ in_debug_mode ? 0 : 1,
+                      /* input_device_index= */ in_debug_mode ? 2 : 1,
                       /* output_device_index= */ in_debug_mode ? 1 : 1,
                       /* treat_input_as_mono= */ !in_debug_mode);
   at.Start();

@@ -12,7 +12,7 @@
 #include <vector>
 
 class StaticFileHandler {
- public:
+public:
   StaticFileHandler(const std::string& directory) : directory_(directory) {}
 
   crow::response operator()(const std::string& filename) const {
@@ -39,12 +39,12 @@ class StaticFileHandler {
     return crow::response(std::move(response_body));
   }
 
- private:
+private:
   std::string directory_;
 };
 
 class AvailablePedalHandler {
- public:
+public:
   crow::response operator()() const {
     const auto registered_pedals =
         PedalRegistry::GetInstance().GetRegisteredPedals();
@@ -60,7 +60,7 @@ class AvailablePedalHandler {
 };
 
 class AdjustKnobHandler {
- public:
+public:
   AdjustKnobHandler(PedalBoard* pedal_board) : pedal_board_(pedal_board) {}
 
   crow::response operator()(const crow::request& request,
@@ -79,12 +79,12 @@ class AdjustKnobHandler {
     return crow::response(200);
   }
 
- private:
+private:
   mutable PedalBoard* pedal_board_;
 };
 
 class ActivePedalHandler {
- public:
+public:
   ActivePedalHandler(const PedalBoard* pedal_board)
       : pedal_board_(pedal_board) {}
 
@@ -100,12 +100,12 @@ class ActivePedalHandler {
     return response;
   }
 
- private:
+private:
   const PedalBoard* pedal_board_;
 };
 
 class RemovePedalHandler {
- public:
+public:
   RemovePedalHandler(PedalBoard* pedal_board) : pedal_board_(pedal_board) {}
 
   crow::response operator()(int pedal_index) const {
@@ -113,12 +113,25 @@ class RemovePedalHandler {
     return crow::response(200);
   }
 
- private:
+private:
+  mutable PedalBoard* pedal_board_;
+};
+
+class PushButtonHandler {
+public:
+  PushButtonHandler(PedalBoard* pedal_board) : pedal_board_(pedal_board) {}
+
+  crow::response operator()(int pedal_index) const {
+    pedal_board_->Push(pedal_index);
+    return crow::response(200);
+  }
+
+private:
   mutable PedalBoard* pedal_board_;
 };
 
 class AddPedalHandler {
- public:
+public:
   AddPedalHandler(PedalBoard* pedal_board) : pedal_board_(pedal_board) {}
 
   crow::response operator()(const std::string& pedal_name) const {
@@ -132,7 +145,7 @@ class AddPedalHandler {
     return crow::response(200);
   }
 
- private:
+private:
   mutable PedalBoard* pedal_board_;
 };
 

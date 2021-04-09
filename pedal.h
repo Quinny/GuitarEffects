@@ -23,11 +23,16 @@ struct PedalInfo {
 // the pedal should also conform to that range, otherwise the sound card may
 // produce crackling noises.
 class Pedal {
- public:
+public:
   virtual SignalType Transform(SignalType signal) = 0;
   virtual void AdjustKnob(const PedalKnob& /* knob */) {}
   virtual PedalInfo Describe() = 0;
   virtual ~Pedal() = default;
+  virtual void Push() { enabled_ = !enabled_; }
+  bool Enabled() const { return enabled_; }
+
+private:
+  bool enabled_ = true;
 };
 
 #endif /* PEDAL_H */
