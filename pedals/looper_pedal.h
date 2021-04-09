@@ -13,7 +13,7 @@
 // input signal. 1.0 means replay the loop at full volume at which it was
 // recorded, 0.8 means 80%, etc.
 class LooperPedal : public Pedal {
- public:
+public:
   enum class Mode {
     BYPASS,
     RECORD,
@@ -22,19 +22,19 @@ class LooperPedal : public Pedal {
 
   SignalType Transform(SignalType signal) override {
     switch (mode_) {
-      case Mode::BYPASS:
-        return signal;
-      case Mode::RECORD:
-        loop_buffer_.push_back(signal);
-        return signal;
-      case Mode::REPLAY:
-        SignalType output =
-            signal + (loop_buffer_[loop_position_] * loop_blend_);
+    case Mode::BYPASS:
+      return signal;
+    case Mode::RECORD:
+      loop_buffer_.push_back(signal);
+      return signal;
+    case Mode::REPLAY:
+      SignalType output = signal + (loop_buffer_[loop_position_] * loop_blend_);
 
-        ++loop_position_;
-        if (loop_position_ > end_frame_) loop_position_ = start_frame_;
+      ++loop_position_;
+      if (loop_position_ > end_frame_)
+        loop_position_ = start_frame_;
 
-        return output;
+      return output;
     }
     return signal;
   }
@@ -108,7 +108,25 @@ class LooperPedal : public Pedal {
     }
   }
 
- private:
+  // Override the button press impact on the looper pedal to shift states
+  // instead of disabling.
+  void Push() override {
+    PedalKnob adjustment;
+    switch (mode_) {
+    case Mode::BYPASS:
+      adjustment.name = "record";
+      break;
+    case Mode::RECORD:
+      adjustment.name = "replay";
+      break;
+    case Mode::REPLAY:
+      adjustment.name = "bypass";
+      break;
+    }
+    AdjustKnob(adjustment);
+  }
+
+private:
   int loop_position_ = 0;
   int start_frame_ = 0;
   int end_frame_ = 0;
