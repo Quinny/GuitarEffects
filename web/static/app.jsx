@@ -126,9 +126,13 @@ class ActivePedal extends React.Component {
       <div class="active-pedal">
         <h4 class="card-title">
           {this.props.name}
+          {this.props.summary &&
+            <h6 className="d-inline-block card-subtitle text-muted float-right margin-top">
+              #{this.props.index}
+            </h6>}
         </h4>
 
-        {knobs}
+        {!this.props.summary && knobs}
         <br />
         <button
           class="btn btn-small btn-secondary"
@@ -136,6 +140,7 @@ class ActivePedal extends React.Component {
           {this.props.state}
         </button>
         &nbsp;
+
         <button
           class="btn btn-danger btn-small"
           onClick={this.remove.bind(this)} >
@@ -173,7 +178,7 @@ class PedalBoard extends React.Component {
   }
 
   render() {
-    return this.state.pedals.map((pedal, index) => {
+    var fullView = this.state.pedals.map((pedal, index) => {
       return (
           <div className="row">
             <div className="col-md-8 offset-md-2 col-xs-12">
@@ -183,13 +188,40 @@ class PedalBoard extends React.Component {
                      name={pedal.name}
                      state={pedal.state}
                      knobs={pedal.knobs}
-                     index={index} />
+                     index={index}
+                     summary={false} />
                 </div>
               </div>
             </div>
           </div>
       )
     });
+
+    var summaryView = this.state.pedals.map((pedal, index) => {
+      return (
+          <div className="col-xs-2">
+            <div className="card">
+              <div className="card-block">
+                <ActivePedal
+                   name={pedal.name}
+                   state={pedal.state}
+                   knobs={pedal.knobs}
+                   index={index}
+                   summary={true} />
+              </div>
+            </div>
+          </div>
+      )
+    });
+
+    return (
+      <div>
+        <div className="row justify-content-md-center">
+          {summaryView}
+        </div>
+        {fullView}
+      </div>
+    );
   }
 }
 
