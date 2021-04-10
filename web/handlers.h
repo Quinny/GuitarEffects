@@ -8,7 +8,9 @@
 #include "web/serializers.h"
 
 #include <fstream>
+#include <mutex>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 class StaticFileHandler {
@@ -59,30 +61,6 @@ public:
   }
 };
 
-class AdjustKnobHandler {
-public:
-  AdjustKnobHandler(PedalBoard* pedal_board) : pedal_board_(pedal_board) {}
-
-  crow::response operator()(const crow::request& request,
-                            int pedal_index) const {
-    auto* name_param = request.url_params.get("name");
-    auto* value_param = request.url_params.get("value");
-
-    if (!name_param || !value_param) {
-      return crow::response(400);
-    }
-
-    PedalKnob knob;
-    knob.name = name_param;
-    knob.value = std::stod(value_param);
-    pedal_board_->AdjustKnob(pedal_index, knob);
-    return crow::response(200);
-  }
-
-private:
-  mutable PedalBoard* pedal_board_;
-};
-
 class ActivePedalHandler {
 public:
   ActivePedalHandler(const PedalBoard* pedal_board)
@@ -104,35 +82,93 @@ private:
   const PedalBoard* pedal_board_;
 };
 
+class UpdatesHandler {
+public:
+  void RegisterConnection(crow::websocket::connection* connection) {
+    std::lock_guard<std::mutex> lock(mu_);
+    connections_.insert(connection);
+  }
+
+  void RemoveConnection(crow::websocket::connection* connection) {
+    std::lock_guard<std::mutex> lock(mu_);
+    connections_.erase(connection);
+  }
+
+  void OnUpdate() {
+    std::lock_guard<std::mutex> lock(mu_);
+    for (auto* connection : connections_) {
+      connection->send_text("ping");
+    }
+  }
+
+private:
+  std::mutex mu_;
+  std::unordered_set<crow::websocket::connection*> connections_;
+};
+
 class RemovePedalHandler {
 public:
-  RemovePedalHandler(PedalBoard* pedal_board) : pedal_board_(pedal_board) {}
+  RemovePedalHandler(PedalBoard* pedal_board, UpdatesHandler* updates)
+      : pedal_board_(pedal_board), updates_(updates) {}
 
   crow::response operator()(int pedal_index) const {
     pedal_board_->RemovePedal(pedal_index);
+    updates_->OnUpdate();
     return crow::response(200);
   }
 
 private:
   mutable PedalBoard* pedal_board_;
+  mutable UpdatesHandler* updates_;
+};
+
+class AdjustKnobHandler {
+public:
+  AdjustKnobHandler(PedalBoard* pedal_board, UpdatesHandler* updates)
+      : pedal_board_(pedal_board), updates_(updates) {}
+
+  crow::response operator()(const crow::request& request,
+                            int pedal_index) const {
+    auto* name_param = request.url_params.get("name");
+    auto* value_param = request.url_params.get("value");
+
+    if (!name_param || !value_param) {
+      return crow::response(400);
+    }
+
+    PedalKnob knob;
+    knob.name = name_param;
+    knob.value = std::stod(value_param);
+    pedal_board_->AdjustKnob(pedal_index, knob);
+    updates_->OnUpdate();
+    return crow::response(200);
+  }
+
+private:
+  mutable PedalBoard* pedal_board_;
+  mutable UpdatesHandler* updates_;
 };
 
 class PushButtonHandler {
 public:
-  PushButtonHandler(PedalBoard* pedal_board) : pedal_board_(pedal_board) {}
+  PushButtonHandler(PedalBoard* pedal_board, UpdatesHandler* updates)
+      : pedal_board_(pedal_board), updates_(updates) {}
 
   crow::response operator()(int pedal_index) const {
     pedal_board_->Push(pedal_index);
+    updates_->OnUpdate();
     return crow::response(200);
   }
 
 private:
   mutable PedalBoard* pedal_board_;
+  mutable UpdatesHandler* updates_;
 };
 
 class AddPedalHandler {
 public:
-  AddPedalHandler(PedalBoard* pedal_board) : pedal_board_(pedal_board) {}
+  AddPedalHandler(PedalBoard* pedal_board, UpdatesHandler* updates)
+      : pedal_board_(pedal_board), updates_(updates) {}
 
   crow::response operator()(const std::string& pedal_name) const {
     auto pedal_factory =
@@ -142,11 +178,13 @@ public:
     }
 
     pedal_board_->AddPedal((*pedal_factory)());
+    updates_->OnUpdate();
     return crow::response(200);
   }
 
 private:
   mutable PedalBoard* pedal_board_;
+  mutable UpdatesHandler* updates_;
 };
 
 #endif /* HANDLERS_H */

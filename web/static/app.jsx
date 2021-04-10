@@ -65,19 +65,17 @@ class Knob extends React.Component {
       'name': this.props.name,
       'value': this.props.value + (sign * this.props.tweakAmount),
     };
-    $.get('/adjust_knob/' + this.props.pedalIndex, knobUpdate)
-      .done(this.props.refresh);
+    $.get('/adjust_knob/' + this.props.pedalIndex, knobUpdate);
   }
 
-  // Send the knob update to the server and refresh the board.
+  // Send the knob update to the server.
   onChange(event) {
     const knobUpdate = {
       'name': this.props.name,
       'value': event.target.value,
     };
 
-    $.get('/adjust_knob/' + this.props.pedalIndex, knobUpdate)
-      .done(this.props.refresh);
+    $.get('/adjust_knob/' + this.props.pedalIndex, knobUpdate);
   }
 
   render() {
@@ -108,8 +106,7 @@ class ActivePedal extends React.Component {
 
   // Remove this pedal from the board.
   remove() {
-    $.get('/remove_pedal/' + this.props.index)
-     .done(this.props.refresh);
+    $.get('/remove_pedal/' + this.props.index);
   }
 
   render() {
@@ -119,8 +116,7 @@ class ActivePedal extends React.Component {
             name={knob.name}
             value={knob.value}
             tweakAmount={knob.tweak_amount}
-            pedalIndex={this.props.index}
-            refresh={this.props.refresh} />
+            pedalIndex={this.props.index} />
       )
     });
 
@@ -149,14 +145,13 @@ class PedalBoard extends React.Component {
     this.state = {
       'pedals': []
     };
-
-    // Register a refresh function with the app so that other components can
-    // trigger a board refresh when they change state.
-    this.props.registerRefresh(this.refresh.bind(this));
   }
 
   componentDidMount() {
-    this.refresh();
+    var sock = new WebSocket("ws://localhost:8080/updates");
+    sock.onmessage = e => {
+      this.refresh();
+    }
   }
 
   // Refetch the active pedals from the server.
@@ -178,8 +173,7 @@ class PedalBoard extends React.Component {
                   <ActivePedal
                      name={pedal.name}
                      knobs={pedal.knobs}
-                     index={index}
-                     refresh={this.refresh.bind(this)} />
+                     index={index} />
                 </div>
               </div>
             </div>
@@ -192,27 +186,14 @@ class PedalBoard extends React.Component {
 class App extends React.Component {
   constructor(props) {
     super(props);
-
-    this.refreshHandlers = [];
-  }
-
-  registerRefreshHandler(handler) {
-    this.refreshHandlers.push(handler);
-  }
-
-  refresh() {
-    for (const refreshHandler of this.refreshHandlers) {
-      refreshHandler();
-    }
   }
 
   render() {
     return (
       <div>
-        <AvailablePedalList onChange={this.refresh.bind(this)} />
+        <AvailablePedalList />
         <hr />
-        <PedalBoard
-           registerRefresh={this.registerRefreshHandler.bind(this)} />
+        <PedalBoard />
       </div>
     )
   }

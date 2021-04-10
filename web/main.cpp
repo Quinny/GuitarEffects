@@ -16,19 +16,30 @@ int main(int argc, char* argv[]) {
   crow::SimpleApp app;
   PedalBoard pedal_board;
 
-  AddPedalHandler add_pedal_handler(&pedal_board);
-  CROW_ROUTE(app, "/add_pedal/<string>")(add_pedal_handler);
-
-  RemovePedalHandler remove_pedal_handler(&pedal_board);
-  CROW_ROUTE(app, "/remove_pedal/<int>")(remove_pedal_handler);
-
-  PushButtonHandler push_button_handler(&pedal_board);
-  CROW_ROUTE(app, "/push_button/<int>")(push_button_handler);
-
   ActivePedalHandler active_pedal_handler(&pedal_board);
   CROW_ROUTE(app, "/active_pedals")(active_pedal_handler);
 
-  AdjustKnobHandler adjust_knob_handler(&pedal_board);
+  UpdatesHandler updates_handler;
+  CROW_ROUTE(app, "/updates")
+      .websocket()
+      .onopen([&](crow::websocket::connection& conn) {
+        updates_handler.RegisterConnection(&conn);
+      })
+      .onclose(
+          [&](crow::websocket::connection& conn, const std::string& reason) {
+            updates_handler.RemoveConnection(&conn);
+          });
+
+  AddPedalHandler add_pedal_handler(&pedal_board, &updates_handler);
+  CROW_ROUTE(app, "/add_pedal/<string>")(add_pedal_handler);
+
+  RemovePedalHandler remove_pedal_handler(&pedal_board, &updates_handler);
+  CROW_ROUTE(app, "/remove_pedal/<int>")(remove_pedal_handler);
+
+  PushButtonHandler push_button_handler(&pedal_board, &updates_handler);
+  CROW_ROUTE(app, "/push_button/<int>")(push_button_handler);
+
+  AdjustKnobHandler adjust_knob_handler(&pedal_board, &updates_handler);
   CROW_ROUTE(app, "/adjust_knob/<int>")(adjust_knob_handler);
 
   AvailablePedalHandler available_pedal_handler;
@@ -56,7 +67,7 @@ int main(int argc, char* argv[]) {
 
   AudioTransformer::DumpDeviceInfo();
   AudioTransformer at(transform,
-                      /* input_device_index= */ in_debug_mode ? 2 : 1,
+                      /* input_device_index= */ in_debug_mode ? 0 : 1,
                       /* output_device_index= */ in_debug_mode ? 1 : 1,
                       /* treat_input_as_mono= */ !in_debug_mode);
   at.Start();
