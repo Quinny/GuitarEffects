@@ -15,6 +15,7 @@ struct PedalKnob {
 struct PedalInfo {
   std::string name;
   std::vector<PedalKnob> knobs;
+  std::string state;
 };
 
 // The base pedal class which defines some transformation on the input signal.
@@ -27,9 +28,10 @@ public:
   virtual SignalType Transform(SignalType signal) = 0;
   virtual void AdjustKnob(const PedalKnob& /* knob */) {}
   virtual PedalInfo Describe() = 0;
-  virtual ~Pedal() = default;
   virtual void Push() { enabled_ = !enabled_; }
   bool Enabled() const { return enabled_; }
+  std::string State() const { return enabled_ ? "Enabled" : "Disabled"; }
+  virtual ~Pedal() = default;
 
 private:
   bool enabled_ = true;

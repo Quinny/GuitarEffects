@@ -67,8 +67,8 @@ int main(int argc, char* argv[]) {
 
   AudioTransformer::DumpDeviceInfo();
   AudioTransformer at(transform,
-                      /* input_device_index= */ in_debug_mode ? 0 : 1,
-                      /* output_device_index= */ in_debug_mode ? 1 : 1,
+                      /* input_device_index= */ in_debug_mode ? 1 : 1,
+                      /* output_device_index= */ in_debug_mode ? 2 : 1,
                       /* treat_input_as_mono= */ !in_debug_mode);
   at.Start();
 

@@ -47,6 +47,7 @@ public:
     std::vector<PedalInfo> pedals;
     for (const auto& pedal : pedals_) {
       pedals.push_back(pedal->Describe());
+      pedals.back().state = pedal->State();
     }
     return pedals;
   }

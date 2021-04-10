@@ -15,6 +15,7 @@ crow::json::wvalue SerializePedalKnob(const PedalKnob& pedal_knob) {
 crow::json::wvalue SerializePedalInfo(const PedalInfo& pedal_info) {
   crow::json::wvalue serialized;
   serialized["name"] = pedal_info.name;
+  serialized["state"] = pedal_info.state;
 
   std::vector<crow::json::wvalue> knobs;
   for (const auto& knob : pedal_info.knobs) {

@@ -6,8 +6,7 @@ class AvailablePedal extends React.Component {
 
   // Add this pedal to the active pedal list.
   add() {
-    $.get("/add_pedal/" + this.props.name)
-      .done(this.props.onChange);
+    $.get("/add_pedal/" + this.props.name);
   }
 
   render() {
@@ -41,9 +40,7 @@ class AvailablePedalList extends React.Component {
 
   render() {
     const availablePedals = this.state.pedals.map((pedal) => {
-      return (<AvailablePedal
-                 name={pedal}
-                 onChange={this.props.onChange} />)
+      return (<AvailablePedal name={pedal} />)
     });
 
     return (
@@ -109,6 +106,11 @@ class ActivePedal extends React.Component {
     $.get('/remove_pedal/' + this.props.index);
   }
 
+  // Push the button on this pedal.
+  push() {
+    $.get('/push_button/' + this.props.index);
+  }
+
   render() {
     const knobs = this.props.knobs.map((knob) => {
       return (
@@ -127,7 +129,13 @@ class ActivePedal extends React.Component {
         </h4>
 
         {knobs}
-
+        <br />
+        <button
+          class="btn btn-small btn-secondary"
+          onClick={this.push.bind(this)}>
+          {this.props.state}
+        </button>
+        &nbsp;
         <button
           class="btn btn-danger btn-small"
           onClick={this.remove.bind(this)} >
@@ -148,10 +156,11 @@ class PedalBoard extends React.Component {
   }
 
   componentDidMount() {
-    var sock = new WebSocket("ws://pedalboard/updates");
+    var sock = new WebSocket("ws://" + window.location.host + "/updates");
     sock.onmessage = e => {
       this.refresh();
     }
+    this.refresh();
   }
 
   // Refetch the active pedals from the server.
@@ -172,6 +181,7 @@ class PedalBoard extends React.Component {
                 <div className="card-block">
                   <ActivePedal
                      name={pedal.name}
+                     state={pedal.state}
                      knobs={pedal.knobs}
                      index={index} />
                 </div>
