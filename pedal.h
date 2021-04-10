@@ -30,7 +30,9 @@ public:
   virtual PedalInfo Describe() = 0;
   virtual void Push() { enabled_ = !enabled_; }
   bool Enabled() const { return enabled_; }
-  std::string State() const { return enabled_ ? "Enabled" : "Disabled"; }
+  virtual std::string State() const {
+    return enabled_ ? "Enabled" : "Disabled";
+  }
   virtual ~Pedal() = default;
 
 private:

@@ -126,6 +126,17 @@ public:
     AdjustKnob(adjustment);
   }
 
+  std::string State() const override {
+    switch (mode_) {
+    case Mode::BYPASS:
+      return "Bypass";
+    case Mode::RECORD:
+      return "Record";
+    case Mode::REPLAY:
+      return "Replay";
+    }
+  }
+
 private:
   int loop_position_ = 0;
   int start_frame_ = 0;
