@@ -148,7 +148,7 @@ class PedalBoard extends React.Component {
   }
 
   componentDidMount() {
-    var sock = new WebSocket("ws://localhost:8080/updates");
+    var sock = new WebSocket("ws://pedalboard/updates");
     sock.onmessage = e => {
       this.refresh();
     }
