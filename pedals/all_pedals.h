@@ -10,6 +10,7 @@
 #include "pedals/delay_pedal.h"
 #include "pedals/distortion_pedal.h"
 #include "pedals/echo_pedal.h"
+#include "pedals/flanger_pedal.h"
 #include "pedals/fuzz_pedal.h"
 #include "pedals/looper_pedal.h"
 #include "pedals/lowpass_pedal.h"
