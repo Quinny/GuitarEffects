@@ -90,6 +90,7 @@ public:
     case Mode::REPLAY:
       return "Replay";
     }
+    return "Bad State";
   }
 
 private:
