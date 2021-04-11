@@ -29,11 +29,7 @@ public:
       return signal;
     case Mode::REPLAY:
       SignalType output = signal + (loop_buffer_[loop_position_] * loop_blend_);
-
-      ++loop_position_;
-      if (loop_position_ > end_frame_)
-        loop_position_ = start_frame_;
-
+      loop_position_ = (loop_position_ + 1) % loop_buffer_.size();
       return output;
     }
     return signal;
@@ -44,23 +40,8 @@ public:
     info.name = "Looper";
 
     info.knobs = {
-        PedalKnob{.name = "bypass",
-                  .value = static_cast<double>(mode_ == Mode::BYPASS),
-                  .tweak_amount = 1},
-        PedalKnob{.name = "record",
-                  .value = static_cast<double>(mode_ == Mode::RECORD),
-                  .tweak_amount = 1},
-        PedalKnob{.name = "replay",
-                  .value = static_cast<double>(mode_ == Mode::REPLAY),
-                  .tweak_amount = 1},
         PedalKnob{
             .name = "loop_blend", .value = loop_blend_, .tweak_amount = 0.1},
-        PedalKnob{.name = "start_frame",
-                  .value = static_cast<double>(start_frame_),
-                  .tweak_amount = 22000},
-        PedalKnob{.name = "end_frame",
-                  .value = static_cast<double>(end_frame_),
-                  .tweak_amount = 22000},
     };
     return info;
   }
@@ -70,41 +51,15 @@ public:
       mode_ = Mode::BYPASS;
       loop_buffer_.clear();
       loop_position_ = 0;
-      start_frame_ = 0;
-      end_frame_ = 0;
     } else if (pedal_knob.name == "record") {
       mode_ = Mode::RECORD;
       loop_buffer_.clear();
       loop_position_ = 0;
-      start_frame_ = 0;
-      end_frame_ = 0;
     } else if (pedal_knob.name == "replay") {
       mode_ = Mode::REPLAY;
       loop_position_ = 0;
-      start_frame_ = 0;
-      end_frame_ = loop_buffer_.size();
     } else if (pedal_knob.name == "loop_blend") {
       loop_blend_ = pedal_knob.value;
-    } else if (pedal_knob.name == "start_frame") {
-      int desired_frame = static_cast<int>(pedal_knob.value);
-      // Ensure that:
-      //   0 <= start_frame < end_frame < buffer_size
-      desired_frame = std::max(desired_frame, 0);
-      desired_frame = std::min<int>(desired_frame, loop_buffer_.size());
-      desired_frame = std::min(desired_frame, end_frame_);
-
-      start_frame_ = desired_frame;
-      loop_position_ = start_frame_;
-    } else if (pedal_knob.name == "end_frame") {
-      int desired_frame = static_cast<int>(pedal_knob.value);
-      // Ensure that:
-      //   0 <= start_frame < end_frame < buffer_size
-      desired_frame = std::max(desired_frame, 0);
-      desired_frame = std::max(desired_frame, start_frame_);
-      desired_frame = std::min<int>(desired_frame, loop_buffer_.size());
-
-      end_frame_ = desired_frame;
-      loop_position_ = start_frame_;
     }
   }
 
@@ -139,8 +94,6 @@ public:
 
 private:
   int loop_position_ = 0;
-  int start_frame_ = 0;
-  int end_frame_ = 0;
   double loop_blend_ = 1;
   std::vector<SignalType> loop_buffer_;
   Mode mode_ = Mode::BYPASS;
