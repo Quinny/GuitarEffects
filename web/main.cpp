@@ -51,6 +51,9 @@ int main(int argc, char* argv[]) {
     return static_file_handler("index.html");
   });
 
+  TemperatureHandler temperature_handler;
+  CROW_ROUTE(app, "/temp")(temperature_handler);
+
   StaticFileHandler static_file_handler(/* directory = */ "static");
   CROW_ROUTE(app, "/<string>")(static_file_handler);
 

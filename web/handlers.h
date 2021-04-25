@@ -187,4 +187,27 @@ private:
   mutable UpdatesHandler* updates_;
 };
 
+class TemperatureHandler {
+public:
+  crow::response operator()() const {
+    int temp_celcius;
+    // Try to read the file where the raspberry PI stores the core temp. If
+    // opening that file fails we probably aren't on a pi and thus don't have a
+    // uniform way to read core temp, so return a random number from 50-59 so we
+    // can still test the UI.
+    std::ifstream temp_file_stream("/sys/class/thermal/thermal_zone0/temp");
+    if (temp_file_stream) {
+      double milli_degrees;
+      temp_file_stream >> milli_degrees;
+      temp_celcius = milli_degrees / 1000.0;
+    } else {
+      temp_celcius = (rand() % 10) + 50;
+    }
+
+    crow::json::wvalue response;
+    response["temp"] = temp_celcius;
+    return response;
+  }
+};
+
 #endif /* HANDLERS_H */

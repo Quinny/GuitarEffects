@@ -24,7 +24,8 @@ class AvailablePedalList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      "pedals": []
+      "pedals": [],
+      "temp": 0
     };
   }
 
@@ -36,7 +37,19 @@ class AvailablePedalList extends React.Component {
           "pedals": pedals.sort(),
         });
       });
+
+
+    this.queryTemp();
+    setInterval(this.queryTemp.bind(this), 10000);
   }
+
+  // Query the core temperature of the device.
+  queryTemp() {
+    $.get("/temp").done(response => {
+      this.setState({'temp': response.temp});
+    });
+  }
+
 
   render() {
     const availablePedals = this.state.pedals.map((pedal) => {
@@ -46,6 +59,9 @@ class AvailablePedalList extends React.Component {
     return (
       <div class="available-pedal-list" align="center">
         {availablePedals}
+        <button class="btn btn-secondary btn-small">
+          {this.state.temp} °C
+        </button>
       </div>
     )
   }
