@@ -3,6 +3,8 @@
 A low latency guitar effects processor in C++ suitable for running on smaller
 boards (e.g. a raspberry pi).
 
+![unit in case](case/full.JPG)
+
 # How it works
 
 ## High level overview
