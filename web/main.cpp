@@ -1,3 +1,5 @@
+#define CROW_MAIN
+
 #include <fstream>
 #include <string>
 #include <vector>

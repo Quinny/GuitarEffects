@@ -4,7 +4,8 @@ COMPILE_FLAGS = -lpthread \
 								-lboost_system \
 								-I crow/include \
 								-std=c++1z \
-								-I . \
+							 	-I . \
+								-D CROW_DISABLE_STATIC_DIR \
 								-I cycfi/Q/q_lib/include \
 								-I cycfi/infra/include
 
