@@ -100,20 +100,39 @@ port 80).
 
 # Setting up on a Raspberry Pi
 
-My current setup is as follows:
+## Parts List
 
-1. A raspberry pi 4 connected to a [7 inch touch screen](https://www.amazon.com/Raspberry-Pi-7-Touchscreen-Display/dp/B0153R2A9I/)
-1. A [Behringer audio interface](https://www.amazon.com/BEHRINGER-Audio-Interface-1-Channel-UM2/dp/B00EK1OTZC) connected to the PI's USB port
-1. My guitar is plugged into the audio interface input port, and then the output
-of the audio interface runs into my amp (or into the start of your physical pedal chain)
-1. The server program from this repo runs on the raspberry pi
-1. Chromium runs and connects to `localhost` so that I can interface with the
-pedals from the touch screen
+1. Raspberry Pi 4
+1. [7 inch touch screen](https://www.amazon.com/Raspberry-Pi-7-Touchscreen-Display/dp/B0153R2A9I/)
+1. [5 push buttons](https://www.amazon.com/gp/product/B0751BHY99) - Any buttons that are the same diameter shouyd work
+1. [Bunch of jumper wires](https://www.amazon.com/gp/product/B01EV70C78) - Any jumper wires should work
+1. [Bread board](https://www.amazon.com/gp/product/B07PCJP9DY) - You can probably get away without this, but I wanted a common ground
+1. [Fan](https://www.amazon.com/GeeekPi-Raspberry-30x30x7mm-Brushless-Retroflag/dp/B07C9C99RM) - Any small-ish 3.3v fan should work
+1. [3D printed case](case/)
+1. [Behringer audio interface](https://www.amazon.com/BEHRINGER-Audio-Interface-1-Channel-UM2/dp/B00EK1OTZC) - Any audio interface will work
+1. [USB extension cable](https://www.amazon.com/gp/product/B06XXL2H6F) - This makes it easier to plug the audio interface into the Pi through the opening in the back of the case, any brand should work
+1. [Pi 4 power switch](https://www.amazon.com/gp/product/B07WFVQ6K5) - This makes it easier to turn the Pi on and off through the opening in the back of the case, any brand should work
 
-You can mix and match whatever components you want, any audio interface with
-an input and output port should work, and you can run the server program on
-any device you can plug an audio interface into. I've run this setup using my
-Macbook with similar results (though bulky and less portable).
+## Assembly
+
+1. Mount the Pi to the back of the touch screen and hook up the ribbon cable and GPIO pins according to the instructions on the product page
+1. Mount the buttons to the top of the case by unscrewing the ring on the button, putting the button through the hole in the case, and then screw down the ring again.
+   Make sure the terminals for the button are facing towards the screen to leave room for the wires
+1. (Optional) Mount the breadboard in the empty space between the buttons and the screen hole
+1. Mount the screen in the top of the case and lay it flat so the terminals of the buttons are facing up
+1. Wire one terminal from each button to a ground connection
+1. Wire the other terminal to a GPIO pin, from left to right:
+   1. Pin 6
+   1. Pin 12
+   1. Pin 16
+   1. Pin 20
+   1. Pin 21
+1. Wire the fan to any open 3.3v terminal and ground
+1. Plug in the USB extension and power switch cords
+1. Place the top of the case into the bottom, threading the extension and power
+   cords through the opening in the back
+
+![](case/annotated_wiring.jpg)
 
 Note that since the server program exposes an HTTP server you can actually
 navigate to the IP address of your PI from any device connected to the same
