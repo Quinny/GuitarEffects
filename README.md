@@ -122,11 +122,11 @@ port 80).
 1. Mount the screen in the top of the case and lay it flat so the terminals of the buttons are facing up
 1. Wire one terminal from each button to a ground connection
 1. Wire the other terminal to a GPIO pin, from left to right:
-   1. Pin 6
-   1. Pin 12
-   1. Pin 16
-   1. Pin 20
-   1. Pin 21
+   1. GPIO Pin 6 (Pin 31)
+   1. GPIO Pin 12 (Pin 32)
+   1. GPIO Pin 16 (Pin 36)
+   1. GPIO Pin 20 (Pin 38)
+   1. GPIO Pin 21 (Pin 40)
 1. Wire the fan to any open 3.3v terminal and ground
 1. Plug in the USB extension and power switch cords
 1. Place the top of the case into the bottom, threading the extension and power
