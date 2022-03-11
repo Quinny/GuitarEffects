@@ -1,6 +1,8 @@
 #ifndef AUDIO_TRANSFORMER_H
 #define AUDIO_TRANSFORMER_H
 
+#include <iostream>
+
 #include "rtaudio/RtAudio.h"
 #include "signal_type.h"
 
@@ -10,9 +12,16 @@ namespace internal {
 // callback.
 struct StreamSettings {
   SignalTransformFn transform_fn;
-  int num_channels;
-  bool treat_input_as_mono = false;
+  int num_output_channels;
 };
+
+SignalType clip(SignalType input) {
+  if (input > 1)
+    return 1;
+  if (input < -1)
+    return -1;
+  return input;
+}
 
 // Callback on each buffer recieved from the RTAudio library. Applies the
 // transformation function to the signal and writes the result into the output
@@ -20,74 +29,59 @@ struct StreamSettings {
 int callback(void* output_buffer, void* input_buffer,
              unsigned int buffered_frames, double /* stream_time */,
              RtAudioStreamStatus status, void* data) {
-  // if (status) std::cout << "Stream over/underflow detected." << std::endl;
+  if (status) {
+    std::cerr << "Stream over/underflow detected. Status: " << status
+              << std::endl;
+  }
 
   auto* input = (SignalType*)input_buffer;
   auto* output = (SignalType*)output_buffer;
   auto* stream_settings = (StreamSettings*)data;
   const auto& transform_fn = stream_settings->transform_fn;
 
-  // There is 1 frame per each channel, so we need to read signal from each
-  // channel.
-  for (unsigned int frame = 0;
-       frame < buffered_frames * stream_settings->num_channels;
-       frame += stream_settings->num_channels) {
-    for (int channel = 0; channel < stream_settings->num_channels; ++channel) {
-      // If the input is a mono device, then only call the transform function
-      // on the first channel.
-      int input_offset = stream_settings->treat_input_as_mono ? 0 : channel;
-      *(output + frame + channel) =
-          transform_fn(*(input + frame + input_offset));
+  for (unsigned int frame = 0; frame < buffered_frames; ++frame) {
+    auto transformed_input = clip(transform_fn(*input));
+    ++input;
+    for (int channel = 0; channel < stream_settings->num_output_channels;
+         ++channel) {
+      *output = transformed_input;
+      ++output;
     }
   }
   return 0;
 }
 
-}  // namespace internal
+} // namespace internal
 
 class AudioTransformer {
- public:
+public:
   // Open an audio stream that reads signal from `input_device_index`,
   // transforms it using `transform_fn` and writes the result to
   // `output_device_index`.
-  //
-  // If `treat_input_as_mono` is true, the input signal will be copied from the
-  // first channel into each channel of the output. E.g. guitars typically have
-  // single channel (i.e. mono) output, and thus need to be replicated to all
-  // channels in order to utilize all speakers of the output device.
   AudioTransformer(SignalTransformFn transform_fn, int input_device_index,
-                   int output_device_index, bool treat_input_as_mono) {
+                   int output_device_index) {
     const auto input_device =
         audio_interface_.getDeviceInfo(input_device_index);
     const auto output_device =
         audio_interface_.getDeviceInfo(output_device_index);
-    const auto num_channels =
-        std::min(input_device.inputChannels, output_device.outputChannels);
     const auto sample_rate = std::min(input_device.preferredSampleRate,
                                       output_device.preferredSampleRate);
 
     stream_settings_.transform_fn = std::move(transform_fn);
-    stream_settings_.num_channels = num_channels;
-    stream_settings_.treat_input_as_mono = treat_input_as_mono;
+    stream_settings_.num_output_channels = output_device.outputChannels; // 1
 
     input_stream_parameters_.deviceId = input_device_index;
-    input_stream_parameters_.nChannels = num_channels;
+    // Most guitars just output mono.
+    input_stream_parameters_.nChannels = 1;
 
     output_stream_parameters_.deviceId = output_device_index;
-    output_stream_parameters_.nChannels = num_channels;
+    output_stream_parameters_.nChannels = output_device.outputChannels; // 1
 
     audio_interface_.showWarnings(true);
 
-    switch (audio_interface_.getCurrentApi()) {
-      case RtAudio::LINUX_ALSA:
-        // Alsa doesn't appear to support passing 0 for this variable. 32 was
-        // choosen experimentally as the lowest possible value that doesn't
-        // cause Alsa to complain.
-        frames_to_buffer_ = 32;
-        break;
-      default:
-        break;
-    }
+    // 32 was choosen experimentally as the lowest possible value that doesn't
+    // cause sound cards to complain.
+    frames_to_buffer_ = 32;
 
     audio_interface_.openStream(
         &output_stream_parameters_, &input_stream_parameters_, RTAUDIO_FLOAT32,
@@ -116,7 +110,7 @@ class AudioTransformer {
     }
   }
 
- private:
+private:
   RtAudio audio_interface_;
   RtAudio::StreamParameters input_stream_parameters_;
   RtAudio::StreamParameters output_stream_parameters_;
