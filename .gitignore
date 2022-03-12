@@ -3,3 +3,4 @@ a.out
 .gdb_history
 bin/
 curves/
+web/devices.txt
