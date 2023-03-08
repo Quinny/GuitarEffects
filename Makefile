@@ -28,15 +28,19 @@ ifeq ($(UNAME), Darwin)
 	COMPILE_FLAGS += -lsdl2
 endif
 
-all: record server
 
-plot:
+makedir:
+	mkdir -p bin
+
+all: makedir record server
+
+plot: makedir
 	${COMPILER} plot.cpp ${COMPILE_FLAGS} ${MATPLOT_FLAGS} -o ./bin/plot
 
-server:
+server: makedir
 	${COMPILER} web/main.cpp ${COMPILE_FLAGS} -o ./bin/server
 
-record:
+record: makedir
 	${COMPILER} record.cpp ${COMPILE_FLAGS} -o ./bin/record
 
 run: all
