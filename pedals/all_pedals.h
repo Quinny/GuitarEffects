@@ -15,6 +15,7 @@
 #include "pedals/looper_pedal.h"
 #include "pedals/lowpass_pedal.h"
 #include "pedals/reverb_pedal.h"
+#include "pedals/sawtooth.h"
 #include "pedals/sigmoid_pedal.h"
 #include "pedals/tanh_pedal.h"
 #include "pedals/wav_looper.h"
