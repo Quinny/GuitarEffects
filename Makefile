@@ -3,7 +3,9 @@ COMPILER = g++
 COMPILE_FLAGS = -lpthread \
 								-lboost_system \
 								-I crow/include \
-								-std=c++1z \
+								-std=c++1y \
+								-w \
+								-Wno-enum-constexpr-conversion \
 							 	-I . \
 								-D CROW_DISABLE_STATIC_DIR \
 								-I cycfi/Q/q_lib/include \
